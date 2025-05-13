@@ -1,0 +1,182 @@
+@ -0,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Terracotta Construction - Expert Craftsmanship Across Texas. Request a Free Quote today." />
+    <title>Terracotta Construction</title>
+    <!-- SEO Meta Tags -->
+<meta name="description" content="Terracotta Construction offers expert craftsmanship in metal buildings, maintenance, landscaping, handyman, and remodeling services across Texas.">
+<meta name="keywords" content="Terracotta Construction, Texas construction, metal buildings, property maintenance, landscaping, handyman, remodeling, fencing">
+<meta name="robots" content="index, follow">
+
+<!-- OpenGraph (Social Sharing Preview) -->
+<meta property="og:title" content="Terracotta Construction - Texas Craftsmanship You Can Trust">
+<meta property="og:description" content="Serving Texas with trusted construction, maintenance, and remodeling services. Get a free quote today.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://terracottaconstruction.com/">
+<meta property="og:image" content="https://terracottaconstruction.com/assets/images/logo.jpg">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏗️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'media',
+        theme: {
+          extend: {
+            colors: {
+              terracotta: '#C1440E',
+              primaryYellow: '#F4B400',
+              charcoal: '#333333',
+              deepGreen: '#3E7C48',
+            },
+            fontFamily: {
+              heading: ['Raleway', 'sans-serif'],
+              body: ['Roboto', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-white text-charcoal font-body">
+    <!-- Top Header -->
+<!-- Mobile-Friendly Header with Slide-In Menu -->
+<header class="bg-terracotta text-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="index.html" class="flex items-center gap-3">
+      <img src="assets/images/logo.jpg" alt="Terracotta Construction Logo" class="h-10 w-auto" />
+      <span class="font-heading text-xl md:text-2xl text-white">Terracotta Construction</span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex space-x-6 text-sm md:text-base font-medium">
+      <a href="index.html" class="hover:underline">Home</a>
+      <a href="#services" class="hover:underline">Services</a>
+      <a href="contact.html" class="hover:underline">Contact</a>
+    </nav>
+
+    <!-- Mobile Hamburger Button -->
+    <button id="menuToggle" class="md:hidden text-white focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Slide-Out Menu -->
+  <div id="mobileMenu" class="md:hidden fixed top-0 right-0 h-full w-2/3 bg-white text-charcoal shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out z-40">
+    <div class="p-6 flex flex-col gap-4">
+      <button id="menuClose" class="self-end text-xl font-bold">&times;</button>
+      <a href="index.html" class="hover:underline">Home</a>
+      <a href="#services" class="hover:underline">Services</a>
+      <a href="contact.html" class="hover:underline">Contact</a>
+    </div>
+  </div>
+</header>
+  
+  <!-- Hero Section with Overlay -->
+  <section class="relative h-[85vh] w-full">
+    <img 
+    src="assets/images/metal_building.jpg" 
+    alt="Metal building by Terracotta Construction" 
+    class="absolute inset-0 w-full h-full object-cover z-0"
+/>
+    <div class="absolute inset-0 bg-black/60 z-10"></div>
+    <div class="relative z-20 flex flex-col justify-center items-center h-full px-4 text-center text-white">
+      <h2 class="text-3xl md:text-5xl font-heading mb-4 drop-shadow">Expert Craftsmanship. Lasting Relationships.</h2>
+      <p class="mb-6 text-lg">Metal Buildings • Maintenance • Fencing</p>
+      <a href="#contact" class="bg-primaryYellow text-charcoal font-bold px-6 py-3 rounded-md hover:bg-yellow-400">
+        Request a Free Quote
+      </a>
+    </div>
+  </section>
+  
+<!-- About Summary -->
+<section class="bg-deepGreen text-white py-12 px-6 text-center">
+    <h3 class="text-2xl font-heading mb-4">Who We Are</h3>
+    <p class="max-w-2xl mx-auto">
+      Since 2010, Terracotta Construction has proudly served Texas with expert craftsmanship and a commitment to lasting relationships. We specialize in metal buildings, residential and commercial maintenance, fencing, and everyday property solutions — built right and built to last.
+    </p>
+  </section>
+
+  <!-- Services Overview Section -->
+<section class="py-12 px-6 text-center" id="services">
+  <h3 class="text-2xl font-heading mb-8">Our Services</h3>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    <!-- Core Construction Services -->
+    <a href="core-construction.html" class="bg-gray-300 p-6 rounded shadow hover:bg-gray-400 transition">
+      <h4 class="text-xl font-heading mb-2">Core Construction Services</h4>
+      <p>Metal buildings, renovations, drywall, and painting.</p>
+    </a>
+
+    <!-- Property Maintenance -->
+    <a href="property-maintenance.html" class="bg-gray-300 p-6 rounded shadow hover:bg-gray-400 transition">
+      <h4 class="text-xl font-heading mb-2">Property Maintenance</h4>
+      <p>Routine services for apartments, rentals, and facilities.</p>
+    </a>
+
+    <!-- Outdoor & Landscaping -->
+    <a href="landscaping.html" class="bg-gray-300 p-6 rounded shadow hover:bg-gray-400 transition">
+      <h4 class="text-xl font-heading mb-2">Outdoor & Landscaping</h4>
+      <p>Lawn care, plantings, tree trimming, and fences.</p>
+    </a>
+
+    <!-- Handyman Services -->
+    <a href="handyman.html" class="bg-gray-300 p-6 rounded shadow hover:bg-gray-400 transition">
+      <h4 class="text-xl font-heading mb-2">Handyman Services</h4>
+      <p>Repairs, installations, and small improvement projects.</p>
+    </a>
+
+    <!-- Emergency Service -->
+    <a href="emergency.html" class="bg-gray-300 p-6 rounded shadow hover:bg-gray-400 transition">
+      <h4 class="text-xl font-heading mb-2">Emergency Service</h4>
+      <p>Fast-response property repair and support on-call.</p>
+    </a>
+
+    <!-- Remodeling Services -->
+    <a href="remodeling.html" class="bg-gray-300 p-6 rounded shadow hover:bg-gray-400 transition">
+       <h4 class="text-xl font-heading mb-2">Remodeling Services</h4>
+     <p>Interior and exterior renovations tailored to your space and style.</p>
+    </a>
+    </a>
+  </div>
+</section>
+  
+
+
+    <!-- CTA Section -->
+    <section class="py-10 px-6 text-center">
+        <h3 class="text-xl font-heading mb-4">Let’s Build Something Together</h3>
+        <a href="#contact" class="bg-primaryYellow text-charcoal px-6 py-3 rounded-md font-bold hover:bg-yellow-400">
+          Request a Free Quote
+        </a>
+      </section>
+  
+    <!-- Footer -->
+    <footer class="bg-gray-200 text-sm py-6 px-4 text-center">
+      <p>&copy; 2025 Terracotta Construction. All rights reserved.</p>
+      <p>Designed & Built by StephensCode</p>
+    </footer>
+    <script>
+      const toggle = document.getElementById('menuToggle');
+      const close = document.getElementById('menuClose');
+      const menu = document.getElementById('mobileMenu');
+    
+      toggle.addEventListener('click', () => {
+        menu.classList.remove('translate-x-full');
+        menu.classList.add('translate-x-0');
+      });
+    
+      close.addEventListener('click', () => {
+        menu.classList.remove('translate-x-0');
+        menu.classList.add('translate-x-full');
+      });
+    </script>
+  </body>
+  
+</html>
