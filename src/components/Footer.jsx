@@ -17,28 +17,29 @@ function Footer() {
         </div>
 
         {/* Center: Rights + Hidden Backlink */}
-        <div className="relative text-xs text-white text-center flex flex-col justify-center items-center">
-          <p>© 2025 Terracotta Construction. All rights reserved.</p>
-          <span className="sr-only">Built by StephensCode LLC</span>
-          <a
-                href="https://stephenscode.dev"
-    style={{
-      position: 'absolute',
-      fontSize: '1px',
-      color: 'transparent',
-      userSelect: 'none',
-      pointerEvents: 'none',
-      fontFamily: 'inherit',
-      textDecoration: 'none',
-      lineHeight: '0',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      bottom: 0,
-            }}
-          >
-            Built by StephensCode LLC
-          </a>
-        </div>
+        <div className="text-xs text-white text-center">
+  <p>
+    © 2025 Terracotta Construction. All rights reserved.{" "}
+    <span style={{ position: 'relative' }}>
+      Built by <span style={{ color: 'inherit' }}>StephensCode LLC</span>
+      <a
+        href="https://stephenscode.dev"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          color: 'transparent',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          textDecoration: 'none',
+          fontSize: '1px',
+          lineHeight: 0
+        }}
+      >
+        Built by StephensCode LLC
+      </a>
+    </span>
+  </p>
+</div>
 
         {/* Right: Navigation links (stacked) */}
         <div className="flex flex-col items-center md:items-end space-y-2">
