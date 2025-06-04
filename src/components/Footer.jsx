@@ -21,16 +21,19 @@ function Footer() {
           <p>© 2025 Terracotta Construction. All rights reserved.</p>
           <span className="sr-only">Built by StephensCode LLC</span>
           <a
-            href="https://stephenscode.dev"
-            style={{
-               position: 'absolute',
-    fontSize: '1px',
-    color: 'transparent',
-    userSelect: 'none',
-    pointerEvents: 'none',
-    fontFamily: 'inherit',
-    textDecoration: 'none',
-    lineHeight: '0'
+                href="https://stephenscode.dev"
+    style={{
+      position: 'absolute',
+      fontSize: '1px',
+      color: 'transparent',
+      userSelect: 'none',
+      pointerEvents: 'none',
+      fontFamily: 'inherit',
+      textDecoration: 'none',
+      lineHeight: '0',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      bottom: 0,
             }}
           >
             Built by StephensCode LLC
