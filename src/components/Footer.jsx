@@ -23,14 +23,14 @@ function Footer() {
           <a
             href="https://stephenscode.dev"
             style={{
-              position: 'absolute',
-              bottom: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: '1px',
-              color: 'transparent',
-              userSelect: 'none',
-              pointerEvents: 'none'
+               position: 'absolute',
+    fontSize: '1px',
+    color: 'transparent',
+    userSelect: 'none',
+    pointerEvents: 'none',
+    fontFamily: 'inherit',
+    textDecoration: 'none',
+    lineHeight: '0'
             }}
           >
             Built by StephensCode LLC
