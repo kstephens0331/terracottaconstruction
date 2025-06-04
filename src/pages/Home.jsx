@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import metalBuilding from '../assets/metal_building.jpg';
 import WhyChoose from '../components/WhyChoose';
+import Footer from '../components/Footer';
 
 const HomePage = () => {
   return (
@@ -77,6 +78,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 };
