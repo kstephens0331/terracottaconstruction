@@ -4,7 +4,11 @@
       "Bash(npx create-next-app@latest:*)",
       "Bash(npm install:*)",
       "Bash(mkdir:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(dir /b \"c:\\Users\\usmc3\\OneDrive\\Documents\\terracottaconstruction.com\\customer-portal-server\" 2)",
+      "Bash(nul)",
+      "Bash(dir:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,18 +1,9 @@
+// src/pages/Quotes.jsx
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  serverTimestamp,
-  doc,
-  getDoc
-} from "firebase/firestore";
-import { db } from "../firebase";
-import {
-  calculateMargin,
-  isBelowMinimumMargin
-} from "../modules/marginUtils";
+import { customersAPI, quotesAPI } from "../services/api";
+import { calculateMargin, isBelowMinimumMargin } from "../modules/marginUtils";
+import { success, error } from "../modules/notificationUtils";
 
 function Quotes() {
   const { t } = useTranslation();
@@ -22,6 +13,8 @@ function Quotes() {
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [overrideAllowed, setOverrideAllowed] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
   const [lineItems, setLineItems] = useState([
     { description: "", quantity: 1, cost: 0, price: 0 }
   ]);
@@ -29,18 +22,15 @@ function Quotes() {
   const { margin, totalCost, totalPrice } = calculateMargin(lineItems);
   const belowMargin = isBelowMinimumMargin(margin);
 
-  // Fetch all customers from Firestore
+  // Fetch all customers from API
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "customers"));
-        const customerList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setCustomers(customerList);
+        const data = await customersAPI.getAll();
+        setCustomers(data.customers || []);
       } catch (err) {
         console.error("Failed to fetch customers", err);
+        error("Failed to load customers");
       }
     };
 
@@ -75,31 +65,53 @@ function Quotes() {
     setLineItems(updated);
   };
 
-  // Send quote to Firestore
+  const resetForm = () => {
+    setSelectedCustomerId("");
+    setCustomerName("");
+    setCustomerEmail("");
+    setOverrideAllowed(false);
+    setNotes("");
+    setLineItems([{ description: "", quantity: 1, cost: 0, price: 0 }]);
+  };
+
+  // Send quote via API
   const handleSend = async () => {
     if (belowMargin && !overrideAllowed) {
-      alert("❌ Margin is below 30% and override is not allowed.");
+      error("Margin is below 30% and override is not allowed.");
       return;
     }
 
+    if (!customerName || !customerEmail) {
+      error("Customer name and email are required");
+      return;
+    }
+
+    if (lineItems.length === 0 || !lineItems[0].description) {
+      error("At least one line item is required");
+      return;
+    }
+
+    setLoading(true);
     try {
       const payload = {
-        customer_name: customerName,
-        customer_email: customerEmail,
-        customer_id: selectedCustomerId || null,
-        quote_items: lineItems,
+        customerName,
+        customerEmail,
+        customerId: selectedCustomerId || null,
+        quoteItems: lineItems,
         margin: parseFloat(margin),
         total: parseFloat(totalPrice),
-        allow_override: overrideAllowed,
-        status: "Open",
-        created_at: serverTimestamp(),
+        allowOverride: overrideAllowed,
+        notes
       };
 
-      await addDoc(collection(db, "quotes"), payload);
-      alert("✅ Quote sent and saved successfully.");
+      const result = await quotesAPI.create(payload);
+      success(`Quote ${result.quote_number} created successfully`);
+      resetForm();
     } catch (err) {
       console.error("Send error:", err);
-      alert("❌ Something went wrong while sending the quote.");
+      error(err.message || "Failed to create quote");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,29 +137,34 @@ function Quotes() {
         </select>
       </label>
 
-      <label className="block mb-4">
-        <span className="block font-semibold mb-1">Customer Name</span>
-        <input
-          type="text"
-          value={customerName}
-          onChange={(e) => setCustomerName(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2"
-        />
-      </label>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <label className="block">
+          <span className="block font-semibold mb-1">Customer Name *</span>
+          <input
+            type="text"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            required
+          />
+        </label>
 
-      <label className="block mb-4">
-        <span className="block font-semibold mb-1">Customer Email</span>
-        <input
-          type="email"
-          value={customerEmail}
-          onChange={(e) => setCustomerEmail(e.target.value)}
-          className="w-full border border-gray-300 rounded px-3 py-2"
-        />
-      </label>
+        <label className="block">
+          <span className="block font-semibold mb-1">Customer Email *</span>
+          <input
+            type="email"
+            value={customerEmail}
+            onChange={(e) => setCustomerEmail(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            required
+          />
+        </label>
+      </div>
 
+      <h3 className="font-semibold mb-2">Line Items</h3>
       <div className="space-y-4">
         {lineItems.map((item, index) => (
-          <div key={index} className="grid grid-cols-5 gap-2 items-end">
+          <div key={index} className="grid grid-cols-6 gap-2 items-end">
             <input
               type="text"
               placeholder={t("quotes.description")}
@@ -160,6 +177,7 @@ function Quotes() {
             <input
               type="number"
               min="1"
+              placeholder="Qty"
               value={item.quantity}
               onChange={(e) =>
                 handleItemChange(index, "quantity", e.target.value)
@@ -184,12 +202,14 @@ function Quotes() {
               onChange={(e) => handleItemChange(index, "price", e.target.value)}
               className="border border-gray-300 rounded px-3 py-2"
             />
-            <button
-              onClick={() => removeLineItem(index)}
-              className="text-red-600 hover:underline col-span-1"
-            >
-              {t("quotes.remove")}
-            </button>
+            {lineItems.length > 1 && (
+              <button
+                onClick={() => removeLineItem(index)}
+                className="text-red-600 hover:underline"
+              >
+                {t("quotes.remove")}
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -201,6 +221,17 @@ function Quotes() {
         {t("quotes.addItem")}
       </button>
 
+      <label className="block mt-4">
+        <span className="block font-semibold mb-1">Notes (optional)</span>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+          rows={3}
+          placeholder="Any additional notes for this quote..."
+        />
+      </label>
+
       <div className="mt-6 space-y-2 text-lg font-semibold">
         <div>Total Cost: ${totalCost}</div>
         <div>Total Price: ${totalPrice}</div>
@@ -211,7 +242,7 @@ function Quotes() {
 
       {belowMargin && (
         <div className="mt-4 text-sm text-red-600">
-          ⚠️ This quote is below the required 30% margin.
+          Warning: This quote is below the required 30% margin.
           <label className="ml-2">
             <input
               type="checkbox"
@@ -226,14 +257,23 @@ function Quotes() {
       <div className="mt-6 flex gap-4">
         <button
           onClick={handleSend}
-          disabled={belowMargin && !overrideAllowed}
+          disabled={(belowMargin && !overrideAllowed) || loading}
           className={`${
-            belowMargin && !overrideAllowed
+            (belowMargin && !overrideAllowed) || loading
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-primaryYellow hover:bg-yellow-400"
-          } text-charcoal px-4 py-2 rounded`}
+          } text-charcoal px-4 py-2 rounded flex items-center gap-2`}
         >
+          {loading && (
+            <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-charcoal"></span>
+          )}
           {t("quotes.send")}
+        </button>
+        <button
+          onClick={resetForm}
+          className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+        >
+          Clear Form
         </button>
       </div>
     </div>

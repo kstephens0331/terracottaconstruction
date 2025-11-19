@@ -7,8 +7,11 @@ import Dashboard from "./pages/Dashboard";
 import Quotes from "./pages/Quotes";
 import WorkOrders from "./pages/WorkOrders";
 import Customers from "./pages/Customers";
-import NotFound from "./pages/NotFound"; // Optional
-import Sidebar from "./components/Sidebar"; // Assuming you’ll add this
+import Invoices from "./pages/Invoices";
+import Analytics from "./pages/Analytics";
+import NotFound from "./pages/NotFound";
+import Sidebar from "./components/Sidebar";
+import Toast from "./components/Toast";
 import logo from "./assets/logo.png";
 
 function App() {
@@ -20,10 +23,15 @@ function App() {
       const result = await signInWithPopup(auth, provider);
       const email = result.user.email;
 
-      if (email === "admin@terracottaconstruction.com") {
+      // Admin emails that are allowed access
+      const adminEmails = [
+        "admin@terracottaconstruction.com"
+      ];
+
+      if (adminEmails.includes(email)) {
         setUser(result.user);
       } else {
-        alert("Access denied.");
+        alert("Access denied. Admin privileges required.");
         await signOut(auth);
       }
     } catch (error) {
@@ -82,16 +90,19 @@ function App() {
     <Router>
       <div className="flex min-h-screen">
         <Sidebar onLogout={handleLogout} />
-        <div className="flex-grow p-4">
+        <div className="flex-grow bg-gray-50">
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/quotes" element={<Quotes />} />
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/customers" element={<Customers />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
+        <Toast />
       </div>
     </Router>
   );

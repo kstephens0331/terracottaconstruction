@@ -1,33 +1,27 @@
+// src/pages/WorkOrders.jsx
 import React, { useState, useEffect } from "react";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { workOrdersAPI } from "../services/api";
+import { success, error } from "../modules/notificationUtils";
 
 function WorkOrders() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
   const [reference, setReference] = useState("");
-  const [status, setStatus] = useState("New");
+  const [priority, setPriority] = useState("Normal");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
 
   const fetchOrders = async () => {
     try {
-      const snapshot = await getDocs(collection(db, "work_orders"));
-      const orderList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setOrders(orderList);
+      const data = await workOrdersAPI.getAll();
+      setOrders(data.work_orders || []);
     } catch (err) {
       console.error("Failed to fetch work orders", err);
+      error("Failed to load work orders");
+    } finally {
+      setFetchLoading(false);
     }
   };
 
@@ -35,34 +29,42 @@ function WorkOrders() {
     fetchOrders();
   }, []);
 
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setDescription("");
+    setReference("");
+    setPriority("Normal");
+  };
+
   const handleSubmit = async () => {
     if (!name || !email || !description) {
-      alert("Name, email, and description are required.");
+      error("Name, email, and description are required.");
+      return;
+    }
+
+    if (description.length < 10) {
+      error("Description must be at least 10 characters");
       return;
     }
 
     setLoading(true);
 
     try {
-      await addDoc(collection(db, "work_orders"), {
+      const result = await workOrdersAPI.create({
         customer_name: name,
         customer_email: email,
         description,
         reference,
-        status,
-        created_at: serverTimestamp()
+        priority
       });
 
-      alert("✅ Work order submitted!");
-      setName("");
-      setEmail("");
-      setDescription("");
-      setReference("");
-      setStatus("New");
+      success(`Work Order ${result.work_order_number} created`);
+      resetForm();
       fetchOrders();
     } catch (err) {
       console.error("Submission error", err);
-      alert("Failed to submit work order.");
+      error(err.message || "Failed to create work order");
     } finally {
       setLoading(false);
     }
@@ -70,12 +72,18 @@ function WorkOrders() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const orderRef = doc(db, "work_orders", id);
-      await updateDoc(orderRef, { status: newStatus });
+      await workOrdersAPI.updateStatus(id, newStatus);
+      success(`Status updated to ${newStatus}`);
       fetchOrders();
     } catch (err) {
       console.error("Status update failed", err);
+      error("Failed to update status");
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "—";
+    return new Date(dateString).toLocaleString();
   };
 
   return (
@@ -85,14 +93,14 @@ function WorkOrders() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <input
           type="text"
-          placeholder="Customer Name"
+          placeholder="Customer Name *"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2"
         />
         <input
           type="email"
-          placeholder="Customer Email"
+          placeholder="Customer Email *"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2"
@@ -102,77 +110,110 @@ function WorkOrders() {
           placeholder="Reference (optional)"
           value={reference}
           onChange={(e) => setReference(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-2 col-span-2"
+          className="border border-gray-300 rounded px-3 py-2"
         />
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          className="border border-gray-300 rounded px-3 py-2"
+        >
+          <option value="Low">Low Priority</option>
+          <option value="Normal">Normal Priority</option>
+          <option value="High">High Priority</option>
+          <option value="Urgent">Urgent</option>
+        </select>
         <textarea
-          placeholder="Work Order Description"
+          placeholder="Work Order Description * (min 10 characters)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 col-span-2 min-h-[100px]"
         />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-2"
-        >
-          <option value="New">New</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Complete">Complete</option>
-        </select>
       </div>
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark"
-      >
-        {loading ? "Submitting..." : "Submit Work Order"}
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className={`px-4 py-2 rounded text-white ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-terracotta hover:bg-terracotta-dark"
+          }`}
+        >
+          {loading ? "Submitting..." : "Submit Work Order"}
+        </button>
+        <button
+          onClick={resetForm}
+          className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+        >
+          Clear
+        </button>
+      </div>
 
       <hr className="my-6" />
 
       <h2 className="text-xl font-semibold mb-4">All Work Orders</h2>
-      {orders.length === 0 ? (
+      {fetchLoading ? (
+        <div className="flex items-center justify-center h-32">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-terracotta"></div>
+        </div>
+      ) : orders.length === 0 ? (
         <p className="text-gray-500">No work orders submitted yet.</p>
       ) : (
-        <table className="w-full table-auto border text-sm">
-          <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="p-2">Customer</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Description</th>
-              <th className="p-2">Reference</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="border-t">
-                <td className="p-2">{order.customer_name}</td>
-                <td className="p-2">{order.customer_email}</td>
-                <td className="p-2">{order.description}</td>
-                <td className="p-2">{order.reference}</td>
-                <td className="p-2">
-                  <select
-                    value={order.status}
-                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="New">New</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Complete">Complete</option>
-                  </select>
-                </td>
-                <td className="p-2">
-                  {order.created_at?.toDate
-                    ? order.created_at.toDate().toLocaleString()
-                    : "—"}
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border text-sm">
+            <thead>
+              <tr className="bg-gray-100 text-left">
+                <th className="p-2">WO #</th>
+                <th className="p-2">Customer</th>
+                <th className="p-2">Description</th>
+                <th className="p-2">Priority</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">Created</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id} className="border-t hover:bg-gray-50">
+                  <td className="p-2 font-medium">
+                    {order.work_order_number || order.id.slice(0, 8)}
+                  </td>
+                  <td className="p-2">
+                    <div>{order.customer_name}</div>
+                    <div className="text-xs text-gray-500">{order.customer_email}</div>
+                  </td>
+                  <td className="p-2 max-w-xs truncate">{order.description}</td>
+                  <td className="p-2">
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      order.priority === 'Urgent' ? 'bg-red-100 text-red-800' :
+                      order.priority === 'High' ? 'bg-orange-100 text-orange-800' :
+                      order.priority === 'Low' ? 'bg-gray-100 text-gray-800' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
+                      {order.priority || 'Normal'}
+                    </span>
+                  </td>
+                  <td className="p-2">
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                      className="border border-gray-300 rounded px-2 py-1 text-sm"
+                    >
+                      <option value="New">New</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="On Hold">On Hold</option>
+                      <option value="Complete">Complete</option>
+                    </select>
+                  </td>
+                  <td className="p-2 text-xs text-gray-600">
+                    {formatDate(order.created_at)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

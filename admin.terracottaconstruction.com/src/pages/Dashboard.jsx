@@ -1,67 +1,62 @@
+// src/pages/Dashboard.jsx
 import React, { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc,
-  query,
-  where
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { quotesAPI, workOrdersAPI } from "../services/api";
+import { success, error } from "../modules/notificationUtils";
 
 function Dashboard() {
   const [quotes, setQuotes] = useState([]);
   const [workOrders, setWorkOrders] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchQuotes = async () => {
     try {
-      const snapshot = await getDocs(collection(db, "quotes"));
-      const quoteList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setQuotes(quoteList);
+      const data = await quotesAPI.getAll();
+      setQuotes(data.quotes || []);
     } catch (err) {
       console.error("Error fetching quotes:", err);
+      error("Failed to load quotes");
     }
   };
 
   const fetchWorkOrders = async () => {
     try {
-      const snapshot = await getDocs(collection(db, "work_orders"));
-      const woList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setWorkOrders(woList);
+      const data = await workOrdersAPI.getAll();
+      setWorkOrders(data.work_orders || []);
     } catch (err) {
       console.error("Error fetching work orders:", err);
+      error("Failed to load work orders");
     }
   };
 
   useEffect(() => {
-    fetchQuotes();
-    fetchWorkOrders();
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchQuotes(), fetchWorkOrders()]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const handleQuoteStatusChange = async (id, status) => {
     try {
-      const quoteRef = doc(db, "quotes", id);
-      await updateDoc(quoteRef, { status });
+      await quotesAPI.updateStatus(id, status);
+      success(`Quote status updated to ${status}`);
       fetchQuotes();
     } catch (err) {
       console.error("Failed to update quote status:", err);
+      error("Failed to update quote status");
     }
   };
 
   const handleWorkOrderStatusChange = async (id, status) => {
     try {
-      const woRef = doc(db, "work_orders", id);
-      await updateDoc(woRef, { status });
+      await workOrdersAPI.updateStatus(id, status);
+      success(`Work order status updated to ${status}`);
       fetchWorkOrders();
     } catch (err) {
       console.error("Failed to update work order status:", err);
+      error("Failed to update work order status");
     }
   };
 
@@ -72,6 +67,21 @@ function Dashboard() {
         .toLowerCase()
         .includes(search.toLowerCase())
     );
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount || 0);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto mt-8 p-4 bg-white rounded shadow">
@@ -89,81 +99,84 @@ function Dashboard() {
       {filterData(quotes.filter((q) => q.status === "Open" || q.status === "Approved")).length === 0 ? (
         <p className="text-gray-500 mb-6">No open or approved quotes.</p>
       ) : (
-        <table className="w-full table-auto mb-6 border text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">Customer</th>
-              <th className="p-2 text-left">Email</th>
-              <th className="p-2 text-left">Phone</th>
-              <th className="p-2 text-left">Address</th>
-              <th className="p-2 text-left">Total</th>
-              <th className="p-2 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filterData(quotes.filter((q) => q.status === "Open" || q.status === "Approved")).map((q) => (
-              <tr key={q.id} className="border-t">
-                <td className="p-2">{q.customer_name}</td>
-                <td className="p-2">{q.customer_email}</td>
-                <td className="p-2">{q.phone}</td>
-                <td className="p-2">{q.address}</td>
-                <td className="p-2">${q.total}</td>
-                <td className="p-2">
-                  <select
-                    value={q.status}
-                    onChange={(e) => handleQuoteStatusChange(q.id, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="Open">Open</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                    <option value="Invoiced">Invoiced</option>
-                  </select>
-                </td>
+        <div className="overflow-x-auto mb-6">
+          <table className="w-full table-auto border text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 text-left">Quote #</th>
+                <th className="p-2 text-left">Customer</th>
+                <th className="p-2 text-left">Email</th>
+                <th className="p-2 text-right">Total</th>
+                <th className="p-2 text-left">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filterData(quotes.filter((q) => q.status === "Open" || q.status === "Approved")).map((q) => (
+                <tr key={q.id} className="border-t hover:bg-gray-50">
+                  <td className="p-2 font-medium">{q.quote_number || q.id.slice(0, 8)}</td>
+                  <td className="p-2">{q.customer_name}</td>
+                  <td className="p-2">{q.customer_email}</td>
+                  <td className="p-2 text-right">{formatCurrency(q.total)}</td>
+                  <td className="p-2">
+                    <select
+                      value={q.status}
+                      onChange={(e) => handleQuoteStatusChange(q.id, e.target.value)}
+                      className="border border-gray-300 rounded px-2 py-1"
+                    >
+                      <option value="Open">Open</option>
+                      <option value="Sent">Sent</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                      <option value="Invoiced">Invoiced</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <h2 className="text-xl font-semibold mb-2">Active Work Orders</h2>
       {filterData(workOrders.filter((wo) => wo.status !== "Complete")).length === 0 ? (
         <p className="text-gray-500">No active work orders.</p>
       ) : (
-        <table className="w-full table-auto border text-sm">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">Customer</th>
-              <th className="p-2 text-left">Email</th>
-              <th className="p-2 text-left">Phone</th>
-              <th className="p-2 text-left">Address</th>
-              <th className="p-2 text-left">Description</th>
-              <th className="p-2 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filterData(workOrders.filter((wo) => wo.status !== "Complete")).map((wo) => (
-              <tr key={wo.id} className="border-t">
-                <td className="p-2">{wo.customer_name}</td>
-                <td className="p-2">{wo.customer_email}</td>
-                <td className="p-2">{wo.phone}</td>
-                <td className="p-2">{wo.address}</td>
-                <td className="p-2">{wo.description}</td>
-                <td className="p-2">
-                  <select
-                    value={wo.status}
-                    onChange={(e) => handleWorkOrderStatusChange(wo.id, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1"
-                  >
-                    <option value="New">New</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Complete">Complete</option>
-                  </select>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 text-left">WO #</th>
+                <th className="p-2 text-left">Customer</th>
+                <th className="p-2 text-left">Email</th>
+                <th className="p-2 text-left">Description</th>
+                <th className="p-2 text-left">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filterData(workOrders.filter((wo) => wo.status !== "Complete")).map((wo) => (
+                <tr key={wo.id} className="border-t hover:bg-gray-50">
+                  <td className="p-2 font-medium">{wo.work_order_number || wo.id.slice(0, 8)}</td>
+                  <td className="p-2">{wo.customer_name}</td>
+                  <td className="p-2">{wo.customer_email}</td>
+                  <td className="p-2">{wo.description}</td>
+                  <td className="p-2">
+                    <select
+                      value={wo.status}
+                      onChange={(e) => handleWorkOrderStatusChange(wo.id, e.target.value)}
+                      className="border border-gray-300 rounded px-2 py-1"
+                    >
+                      <option value="New">New</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="On Hold">On Hold</option>
+                      <option value="Complete">Complete</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
