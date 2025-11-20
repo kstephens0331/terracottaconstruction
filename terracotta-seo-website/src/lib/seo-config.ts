@@ -1,4 +1,6 @@
 // SEO Configuration for Terracotta Construction
+import type { Metadata } from 'next';
+
 export const siteConfig = {
   name: 'Terracotta Construction',
   description: 'Professional construction, landscaping, fencing, handyman services, and metal building installation in Montgomery County, TX and surrounding areas. Licensed, insured, and trusted since day one.',
@@ -116,7 +118,7 @@ export const siteConfig = {
 };
 
 // Default metadata for pages
-export const defaultMetadata = {
+export const defaultMetadata: Metadata = {
   title: {
     default: 'Terracotta Construction | Montgomery TX Construction & Handyman Services',
     template: '%s | Terracotta Construction',
