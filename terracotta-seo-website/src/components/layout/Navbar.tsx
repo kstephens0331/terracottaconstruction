@@ -98,6 +98,32 @@ export default function Navbar() {
             >
               Free Estimate
             </Link>
+
+            {/* Login Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center gap-1 text-gray-700 hover:text-[#924C2E] font-medium transition border border-gray-300 px-4 py-2 rounded-md">
+                Login
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute top-full right-0 w-48 bg-white shadow-lg rounded-md py-2 hidden group-hover:block">
+                <a
+                  href="https://customer.terracottaconstruction.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-[#924C2E]"
+                >
+                  Customer Portal
+                </a>
+                <a
+                  href="https://admin.terracottaconstruction.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-[#924C2E]"
+                >
+                  Admin Portal
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -172,6 +198,31 @@ export default function Navbar() {
               >
                 Free Estimate
               </Link>
+
+              {/* Mobile Login Links */}
+              <div className="border-t pt-4 mt-2">
+                <p className="text-gray-500 text-sm mb-2">Login:</p>
+                <div className="flex gap-4">
+                  <a
+                    href="https://customer.terracottaconstruction.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 hover:text-[#924C2E] font-medium text-sm"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Customer Portal
+                  </a>
+                  <a
+                    href="https://admin.terracottaconstruction.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 hover:text-[#924C2E] font-medium text-sm"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Admin Portal
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -13,13 +13,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <Image
-              src="/logo.jpg"
-              alt="Terracotta Construction Logo"
-              width={180}
-              height={60}
-              className="h-12 w-auto mb-4 brightness-0 invert"
-            />
+            <div className="bg-white rounded-lg p-2 inline-block mb-4">
+              <Image
+                src="/logo.jpg"
+                alt="Terracotta Construction Logo"
+                width={180}
+                height={60}
+                className="h-12 w-auto"
+              />
+            </div>
             <p className="text-gray-300 text-sm mb-4">
               Professional construction, landscaping, and handyman services in Montgomery County, TX.
               Licensed, insured, and committed to quality craftsmanship.
