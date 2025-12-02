@@ -1,8 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "framework": "nextjs",
-  "installCommand": "cd terracotta-seo-website && npm install",
-  "buildCommand": "cd terracotta-seo-website && npm run build",
-  "outputDirectory": "terracotta-seo-website/.next"
-}
