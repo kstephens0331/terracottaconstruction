@@ -1,7 +1,7 @@
 // src/pages/Quotes.jsx
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { customersAPI, quotesAPI } from "../services/api";
+import { db } from "../lib/supabase";
 import { calculateMargin, isBelowMinimumMargin } from "../modules/marginUtils";
 import { success, error } from "../modules/notificationUtils";
 
@@ -22,12 +22,12 @@ function Quotes() {
   const { margin, totalCost, totalPrice } = calculateMargin(lineItems);
   const belowMargin = isBelowMinimumMargin(margin);
 
-  // Fetch all customers from API
+  // Fetch all customers from Supabase
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const data = await customersAPI.getAll();
-        setCustomers(data.customers || []);
+        const data = await db.customers.getAll();
+        setCustomers(data || []);
       } catch (err) {
         console.error("Failed to fetch customers", err);
         error("Failed to load customers");
@@ -41,7 +41,7 @@ function Quotes() {
   useEffect(() => {
     const selected = customers.find((c) => c.id === selectedCustomerId);
     if (selected) {
-      setCustomerName(selected.name);
+      setCustomerName(`${selected.first_name} ${selected.last_name}`);
       setCustomerEmail(selected.email);
     }
   }, [selectedCustomerId, customers]);
@@ -74,7 +74,7 @@ function Quotes() {
     setLineItems([{ description: "", quantity: 1, cost: 0, price: 0 }]);
   };
 
-  // Send quote via API
+  // Send quote via Supabase
   const handleSend = async () => {
     if (belowMargin && !overrideAllowed) {
       error("Margin is below 30% and override is not allowed.");
@@ -93,18 +93,27 @@ function Quotes() {
 
     setLoading(true);
     try {
-      const payload = {
-        customerName,
-        customerEmail,
-        customerId: selectedCustomerId || null,
-        quoteItems: lineItems,
-        margin: parseFloat(margin),
+      // Prepare quote data for Supabase
+      const quoteData = {
+        customer_id: selectedCustomerId || null,
+        title: `Quote for ${customerName}`,
+        subtotal: parseFloat(totalCost),
         total: parseFloat(totalPrice),
-        allowOverride: overrideAllowed,
-        notes
+        margin_percent: parseFloat(margin),
+        notes,
+        status: 'Draft'
       };
 
-      const result = await quotesAPI.create(payload);
+      // Prepare line items for Supabase
+      const items = lineItems.map(item => ({
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.price,
+        cost: item.cost,
+        total: item.quantity * item.price
+      }));
+
+      const result = await db.quotes.create(quoteData, items);
       success(`Quote ${result.quote_number} created successfully`);
       resetForm();
     } catch (err) {
@@ -131,7 +140,7 @@ function Quotes() {
           <option value="">-- New Customer --</option>
           {customers.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name} ({c.email})
+              {c.first_name} {c.last_name} ({c.email})
             </option>
           ))}
         </select>

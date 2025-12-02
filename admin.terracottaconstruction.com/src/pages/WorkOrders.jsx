@@ -1,6 +1,6 @@
 // src/pages/WorkOrders.jsx
 import React, { useState, useEffect } from "react";
-import { workOrdersAPI } from "../services/api";
+import { db } from "../lib/supabase";
 import { success, error } from "../modules/notificationUtils";
 
 function WorkOrders() {
@@ -15,8 +15,8 @@ function WorkOrders() {
 
   const fetchOrders = async () => {
     try {
-      const data = await workOrdersAPI.getAll();
-      setOrders(data.work_orders || []);
+      const data = await db.workOrders.getAll();
+      setOrders(data || []);
     } catch (err) {
       console.error("Failed to fetch work orders", err);
       error("Failed to load work orders");
@@ -51,12 +51,11 @@ function WorkOrders() {
     setLoading(true);
 
     try {
-      const result = await workOrdersAPI.create({
-        customer_name: name,
-        customer_email: email,
+      const result = await db.workOrders.create({
+        title: `Work Order for ${name}`,
         description,
-        reference,
-        priority
+        priority: priority.toLowerCase(),
+        status: 'pending'
       });
 
       success(`Work Order ${result.work_order_number} created`);
@@ -72,7 +71,7 @@ function WorkOrders() {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await workOrdersAPI.updateStatus(id, newStatus);
+      await db.workOrders.updateStatus(id, newStatus.toLowerCase().replace(' ', '_'));
       success(`Status updated to ${newStatus}`);
       fetchOrders();
     } catch (err) {
@@ -179,8 +178,8 @@ function WorkOrders() {
                     {order.work_order_number || order.id.slice(0, 8)}
                   </td>
                   <td className="p-2">
-                    <div>{order.customer_name}</div>
-                    <div className="text-xs text-gray-500">{order.customer_email}</div>
+                    <div>{order.customer ? `${order.customer.first_name} ${order.customer.last_name}` : 'N/A'}</div>
+                    <div className="text-xs text-gray-500">{order.customer?.email}</div>
                   </td>
                   <td className="p-2 max-w-xs truncate">{order.description}</td>
                   <td className="p-2">

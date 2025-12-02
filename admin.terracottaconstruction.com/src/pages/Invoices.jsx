@@ -1,7 +1,7 @@
 // src/pages/Invoices.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { invoicesAPI } from '../services/api';
+import { db } from '../lib/supabase';
 import { messages, success, error } from '../modules/notificationUtils';
 import Modal, { ConfirmDialog } from '../components/Modal';
 
@@ -36,9 +36,12 @@ export default function Invoices() {
   const loadInvoices = async () => {
     setLoading(true);
     try {
-      const params = filter ? { status: filter } : {};
-      const data = await invoicesAPI.getAll(params);
-      setInvoices(data.invoices || []);
+      let data = await db.invoices.getAll();
+      // Apply filter if set
+      if (filter) {
+        data = data.filter(inv => inv.status === filter);
+      }
+      setInvoices(data || []);
     } catch (err) {
       console.error('Failed to load invoices:', err);
       messages.fetchError('invoices');
@@ -49,7 +52,7 @@ export default function Invoices() {
 
   const handleStatusChange = async (invoiceId, newStatus) => {
     try {
-      await invoicesAPI.updateStatus(invoiceId, newStatus);
+      await db.invoices.update(invoiceId, { status: newStatus });
       success(`Invoice status updated to ${newStatus}`);
       loadInvoices();
     } catch (err) {
@@ -62,10 +65,10 @@ export default function Invoices() {
     if (!selectedInvoice || !paymentData.amount) return;
 
     try {
-      const result = await invoicesAPI.recordPayment(selectedInvoice.id, {
+      await db.invoices.recordPayment(selectedInvoice.id, {
         amount: parseFloat(paymentData.amount),
         payment_method: paymentData.payment_method,
-        reference: paymentData.reference,
+        reference_number: paymentData.reference,
         notes: paymentData.notes
       });
 
@@ -143,8 +146,8 @@ export default function Invoices() {
                     {invoice.invoice_number}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-medium">{invoice.customer_name}</p>
-                    <p className="text-xs text-gray-500">{invoice.customer_email}</p>
+                    <p className="text-sm font-medium">{invoice.customer ? `${invoice.customer.first_name} ${invoice.customer.last_name}` : 'N/A'}</p>
+                    <p className="text-xs text-gray-500">{invoice.customer?.email}</p>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {formatDate(invoice.created_at)}
