@@ -45,6 +45,10 @@ function Home() {
             Customer Dashboard
           </h1>
 
+          {loading ? (
+            <p className="text-gray-500">Loading...</p>
+          ) : (
+            <>
           {/* Quotes */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-700 mb-2">Recent Quotes</h2>
@@ -96,6 +100,8 @@ function Home() {
               </ul>
             )}
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>

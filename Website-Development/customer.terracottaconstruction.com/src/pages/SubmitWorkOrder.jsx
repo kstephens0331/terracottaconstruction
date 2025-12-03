@@ -1,40 +1,50 @@
 import React, { useState } from "react";
-import { supabase } from "../supabase";
-import { auth } from "../firebase";
+import { auth, db } from "../supabase";
 import Sidebar from "../components/Sidebar";
 
 function SubmitWorkOrder() {
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-    const user = auth.currentUser;
-    if (!user) {
-      setMessage("You must be logged in.");
-      return;
-    }
+    try {
+      const session = await auth.getSession();
+      if (!session?.user) {
+        setMessage("You must be logged in.");
+        return;
+      }
 
-    const { error } = await supabase.from("work_orders").insert([
-      {
-        email: user.email,
+      // Get customer profile
+      const customer = await db.getCustomerByEmail(session.user.email);
+      if (!customer) {
+        setMessage("Customer profile not found.");
+        return;
+      }
+
+      await db.submitWorkOrder({
+        customer_id: customer.id,
+        title: title || "Work Order Request",
         description,
-        address,
-        status: "Pending",
-        submitted_at: new Date().toISOString(),
-      },
-    ]);
+        service_address: address,
+        status: "pending"
+      });
 
-    if (error) {
-      console.error(error);
-      setMessage("Failed to submit work order.");
-    } else {
       setMessage("Work order submitted successfully!");
+      setTitle("");
       setDescription("");
       setAddress("");
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to submit work order.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,6 +62,17 @@ function SubmitWorkOrder() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Title</label>
+              <input
+                type="text"
+                placeholder="e.g., Fence Repair, Lawn Mowing"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#c1440e]"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Service Address</label>
               <input
@@ -76,9 +97,14 @@ function SubmitWorkOrder() {
 
             <button
               type="submit"
-              className="bg-[#c1440e] text-white py-2 px-4 rounded hover:bg-orange-700 transition"
+              disabled={loading}
+              className={`py-2 px-4 rounded transition ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#c1440e] text-white hover:bg-orange-700"
+              }`}
             >
-              Submit Request
+              {loading ? "Submitting..." : "Submit Request"}
             </button>
           </form>
         </div>

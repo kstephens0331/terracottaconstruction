@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth } from "../firebase";
-import { supabase } from "../supabase";
+import { auth, db } from "../supabase";
 import Sidebar from "../components/Sidebar";
 
 function Settings() {
@@ -9,25 +8,22 @@ function Settings() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        setError("User not found.");
-        return;
-      }
+      try {
+        const session = await auth.getSession();
+        if (!session?.user) {
+          setError("User not found.");
+          return;
+        }
 
-      console.log("Fetching profile for:", user.email);
-
-      const { data, error } = await supabase
-        .from("customers")
-        .select("*")
-        .eq("email", user.email)
-        .single();
-
-      if (error) {
-        console.error("Supabase error:", error);
+        const customer = await db.getCustomerByEmail(session.user.email);
+        if (customer) {
+          setProfile(customer);
+        } else {
+          setError("Profile could not be loaded.");
+        }
+      } catch (err) {
+        console.error("Supabase error:", err);
         setError("Profile could not be loaded.");
-      } else {
-        setProfile(data);
       }
     };
 
@@ -45,10 +41,10 @@ function Settings() {
 
           {profile ? (
             <ul className="space-y-3 text-sm text-gray-700">
-              <li><strong>Full Name:</strong> {profile.name}</li>
+              <li><strong>Full Name:</strong> {profile.first_name} {profile.last_name}</li>
               <li><strong>Email:</strong> {profile.email}</li>
               <li><strong>Phone:</strong> {profile.phone || "—"}</li>
-              <li><strong>Address:</strong> {profile.address || "—"}</li>
+              <li><strong>Address:</strong> {profile.address_street || "—"}</li>
               <li><strong>Account #:</strong> {profile.account_number || "—"}</li>
               <li><strong>Joined:</strong> {new Date(profile.created_at).toLocaleDateString()}</li>
             </ul>
