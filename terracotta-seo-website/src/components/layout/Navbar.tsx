@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Menu, X, ChevronDown, Phone } from 'lucide-react';
+import { Menu, X, ChevronDown, Phone, LogIn } from 'lucide-react';
 import { siteConfig } from '@/lib/seo-config';
 
 export default function Navbar() {
@@ -21,8 +21,28 @@ export default function Navbar() {
               {siteConfig.business.phone}
             </a>
           </div>
-          <div className="hidden md:block">
-            Serving Montgomery County & Greater Houston Area
+          <div className="hidden md:flex items-center gap-6">
+            <span>Serving Montgomery County & Greater Houston Area</span>
+            <div className="flex items-center gap-4 border-l border-white/30 pl-4">
+              <a
+                href="https://customer.terracottaconstruction.com"
+                className="flex items-center gap-1 hover:text-gray-200 transition"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <LogIn className="w-4 h-4" />
+                Customer Portal
+              </a>
+              <a
+                href="https://admin.terracottaconstruction.com"
+                className="flex items-center gap-1 hover:text-gray-200 transition"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <LogIn className="w-4 h-4" />
+                Admin
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -172,6 +192,31 @@ export default function Navbar() {
               >
                 Free Estimate
               </Link>
+
+              {/* Portal Links */}
+              <div className="border-t pt-4 mt-2 flex flex-col gap-2">
+                <span className="text-sm text-gray-500 font-medium">Portal Login</span>
+                <a
+                  href="https://customer.terracottaconstruction.com"
+                  className="flex items-center gap-2 text-gray-700 hover:text-[#924C2E]"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <LogIn className="w-4 h-4" />
+                  Customer Portal
+                </a>
+                <a
+                  href="https://admin.terracottaconstruction.com"
+                  className="flex items-center gap-2 text-gray-700 hover:text-[#924C2E]"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <LogIn className="w-4 h-4" />
+                  Admin Portal
+                </a>
+              </div>
             </div>
           </div>
         )}
