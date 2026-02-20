@@ -39,6 +39,7 @@ module.exports = {
       };
     }
 
+// Partners page    if (path === '/partners') {      return {        loc: path,        changefreq: 'monthly',        priority: 0.8,        lastmod: new Date().toISOString(),      };    }
     // About and Contact pages
     if (path === '/about' || path === '/contact') {
       return {
