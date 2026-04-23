@@ -76,7 +76,7 @@ function WorkOrders() {
     doc.line(10, 260, 200, 260);
     doc.text("Terracotta Construction", 10, 266);
     doc.text("(936) 955-4083 | (832) 288-0258", 10, 272);
-    doc.text("admin@terracottaconstruction.com", 10, 278);
+    doc.text("terracottaconstruction@gmail.com", 10, 278);
     doc.text("16724 E. Forrestal St, Montgomery, TX 77316", 10, 284);
 
     doc.save(`workorder-${order.work_order_number || order.id.slice(0, 8)}.pdf`);

@@ -11,7 +11,7 @@ export const siteConfig = {
     legalName: 'Terracotta Construction LLC',
     phone: '(936) 955-4083',
     phoneAlt: '(832) 288-0258',
-    email: 'admin@terracottaconstruction.com',
+    email: 'terracottaconstruction@gmail.com',
     address: {
       street: '16724 E. Forrestal St',
       city: 'Montgomery',
