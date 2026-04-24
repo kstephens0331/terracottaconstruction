@@ -1,13 +1,22 @@
 {
   "dashboard": {
-  "welcome": "Welcome to the Admin Dashboard",
-  "intro": "This is where you can manage quotes, work orders, and customers."
+    "welcome": "Welcome to the Admin Dashboard",
+    "intro": "This is where you can manage quotes, work orders, and customers."
   },
   "login": {
     "title": "Admin Portal",
     "prompt": "Please sign in to continue",
     "button": "Sign in with Google",
-    "toggle": "Español / English"
+    "toggle": "Español / English",
+    "forgotPassword": "Forgot password?",
+    "resetTitle": "Reset your password",
+    "resetDescription": "Enter your admin email and we will send you a link to reset your password.",
+    "resetEmailLabel": "Email",
+    "resetSend": "Send reset link",
+    "resetSending": "Sending...",
+    "resetSuccess": "Check your email for a reset link.",
+    "resetError": "Could not send reset email. Please try again.",
+    "resetCancel": "Cancel"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -17,26 +26,193 @@
     "toggleLanguage": "Español",
     "logout": "Logout"
   },
-"workOrders": {
-  "title": "Work Orders",
-  "placeholder": "This is where you will create and track work orders for each property."
-},
-"customers": {
-  "title": "Customers",
-  "placeholder": "Here you can manage client details like name, contact info, and job history."
-},
-"notFound": {
-  "message": "Page not found.",
-  "back": "Back to Dashboard"
-},
-"quotes": {
-  "title": "Quotes",
-  "customer": "Customer Name",
-  "description": "Item Description",
-  "addItem": "Add Line Item",
-  "remove": "Remove",
-  "total": "Total",
-  "save": "Save Quote",
-  "send": "Send to Email"
-}
+  "workOrders": {
+    "title": "Work Orders",
+    "placeholder": "This is where you will create and track work orders for each property."
+  },
+  "customers": {
+    "title": "Customers",
+    "placeholder": "Here you can manage client details like name, contact info, and job history.",
+    "edit": {
+      "title": "Edit Customer",
+      "save": "Save Changes",
+      "updated": "Customer updated",
+      "updateError": "Failed to update customer",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "zip": "ZIP",
+      "notes": "Notes"
+    }
+  },
+  "invoices": {
+    "fromQuote": {
+      "button": "+ From Quote",
+      "title": "Create Invoice From Quote",
+      "description": "Select an approved quote to convert into an invoice.",
+      "empty": "No approved quotes available.",
+      "submit": "Create Invoice",
+      "success": "Invoice created from quote",
+      "createError": "Failed to create invoice from quote",
+      "loadError": "Failed to load approved quotes"
+    }
+  },
+  "notFound": {
+    "message": "Page not found.",
+    "back": "Back to Dashboard"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "back": "Back",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "none": "None",
+    "all": "All",
+    "required": "Required"
+  },
+  "quotes": {
+    "title": "Quotes",
+    "customer": "Customer Name",
+    "description": "Item Description",
+    "addItem": "Add Line Item",
+    "remove": "Remove",
+    "total": "Total",
+    "save": "Save Quote",
+    "send": "Send to Email",
+    "list": {
+      "title": "Quotes",
+      "newQuote": "New Quote",
+      "empty": "No quotes yet. Create your first quote.",
+      "loading": "Loading quotes...",
+      "errorLoading": "Failed to load quotes",
+      "filterStatus": "Filter by status",
+      "searchCustomer": "Search customer",
+      "allStatuses": "All statuses",
+      "from": "From",
+      "to": "To",
+      "columns": {
+        "quoteNumber": "Quote #",
+        "customer": "Customer",
+        "title": "Title",
+        "status": "Status",
+        "total": "Total",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "confirmDeleteTitle": "Delete Quote",
+      "confirmDeleteMessage": "Are you sure you want to delete this quote? This cannot be undone."
+    },
+    "create": {
+      "title": "Create Quote",
+      "customerSection": "Customer",
+      "detailsSection": "Details",
+      "lineItemsSection": "Line Items",
+      "totalsSection": "Totals",
+      "termsSection": "Terms & Notes",
+      "selectCustomer": "Select a customer",
+      "addNewCustomer": "+ Add new customer",
+      "quoteTitle": "Quote Title",
+      "quoteTitlePlaceholder": "Short title for this quote",
+      "quoteDescription": "Description",
+      "quoteDescriptionPlaceholder": "Optional description",
+      "validUntil": "Valid Until",
+      "item": "Item",
+      "service": "Service",
+      "customItem": "Custom item",
+      "itemDescription": "Description",
+      "quantity": "Qty",
+      "unit": "Unit",
+      "unitPrice": "Unit Price",
+      "unitCost": "Unit Cost",
+      "itemTotal": "Total",
+      "addItem": "+ Add Item",
+      "removeItem": "Remove",
+      "subtotal": "Subtotal",
+      "taxRate": "Tax Rate (%)",
+      "taxAmount": "Tax",
+      "discount": "Discount",
+      "grandTotal": "Total",
+      "margin": "Margin",
+      "marginWarning": "Margin is below {{threshold}}% threshold",
+      "terms": "Terms",
+      "termsPlaceholder": "Payment terms, warranty, etc.",
+      "notes": "Internal Notes",
+      "notesPlaceholder": "Internal notes (not visible to customer)",
+      "saveDraft": "Save as Draft",
+      "saveAndSend": "Save & Send",
+      "cancel": "Cancel",
+      "validation": {
+        "customerRequired": "Please select a customer",
+        "titleRequired": "Quote title is required",
+        "itemsRequired": "At least one line item is required",
+        "itemInvalid": "Each item needs a description, quantity, and unit price greater than zero"
+      },
+      "created": "Quote created successfully",
+      "createError": "Failed to create quote"
+    },
+    "edit": {
+      "title": "Edit Quote",
+      "save": "Save Changes",
+      "updated": "Quote updated successfully",
+      "updateError": "Failed to update quote"
+    },
+    "detail": {
+      "loading": "Loading quote...",
+      "errorLoading": "Failed to load quote",
+      "notFound": "Quote not found",
+      "customerCard": "Customer",
+      "datesCard": "Dates",
+      "lineItemsCard": "Line Items",
+      "activityCard": "Activity",
+      "activityEmpty": "No activity yet",
+      "created": "Created",
+      "validUntil": "Valid Until",
+      "sentAt": "Sent At",
+      "approvedAt": "Approved At",
+      "revisionBanner": "Revision requested by customer",
+      "editToCreateNewVersion": "Edit to create new version",
+      "markAsSent": "Mark as Sent",
+      "markAsApproved": "Mark as Approved",
+      "markAsRejected": "Mark as Rejected",
+      "convertToInvoice": "Convert to Invoice",
+      "edit": "Edit",
+      "delete": "Delete",
+      "statusUpdated": "Status updated to {{status}}",
+      "statusUpdateError": "Failed to update status",
+      "invoiceCreated": "Invoice created from quote",
+      "invoiceCreateError": "Failed to create invoice",
+      "deleted": "Quote deleted",
+      "deleteError": "Failed to delete quote",
+      "confirmSendTitle": "Send Quote",
+      "confirmSendMessage": "Mark this quote as sent? This will notify the customer."
+    },
+    "status": {
+      "Draft": "Draft",
+      "Pending": "Pending",
+      "Sent": "Sent",
+      "Viewed": "Viewed",
+      "Approved": "Approved",
+      "Rejected": "Rejected",
+      "Revision Requested": "Revision Requested",
+      "Expired": "Expired",
+      "Invoiced": "Invoiced"
+    }
+  }
 }

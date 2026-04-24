@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { db } from "../lib/supabase";
 import { success, error } from "../modules/notificationUtils";
+import Modal from "../components/Modal";
 
 function Customers() {
   const { t } = useTranslation();
@@ -18,6 +19,22 @@ function Customers() {
   const [zip, setZip] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
+
+  // Edit modal state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editTarget, setEditTarget] = useState(null);
+  const [editForm, setEditForm] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    address_street: "",
+    address_city: "",
+    address_state: "",
+    address_zip: "",
+    notes: ""
+  });
 
   // Load all customers from Supabase
   const fetchCustomers = async () => {
@@ -96,6 +113,80 @@ function Customers() {
     } catch (err) {
       console.error("Status update failed", err);
       error("Failed to update customer status");
+    }
+  };
+
+  const openEditModal = (customer) => {
+    setEditTarget(customer);
+    setEditForm({
+      first_name: customer.first_name || "",
+      last_name: customer.last_name || "",
+      email: customer.email || "",
+      phone: customer.phone || "",
+      address_street: customer.address_street || "",
+      address_city: customer.address_city || "",
+      address_state: customer.address_state || "",
+      address_zip: customer.address_zip || "",
+      notes: customer.notes || ""
+    });
+    setEditOpen(true);
+  };
+
+  const closeEditModal = () => {
+    if (editSaving) return;
+    setEditOpen(false);
+    setEditTarget(null);
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditSave = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!editTarget) return;
+
+    const trimmedFirst = (editForm.first_name || "").trim();
+    const trimmedLast = (editForm.last_name || "").trim();
+    const trimmedEmail = (editForm.email || "").trim();
+
+    // Validation: need at least a first or last name
+    if (!trimmedFirst && !trimmedLast) {
+      error("A first or last name is required");
+      return;
+    }
+
+    // Email validation if provided
+    if (trimmedEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedEmail)) {
+        error("Please enter a valid email address");
+        return;
+      }
+    }
+
+    setEditSaving(true);
+    try {
+      await db.customers.update(editTarget.id, {
+        first_name: trimmedFirst || null,
+        last_name: trimmedLast || null,
+        email: trimmedEmail || null,
+        phone: editForm.phone?.trim() || null,
+        address_street: editForm.address_street?.trim() || null,
+        address_city: editForm.address_city?.trim() || null,
+        address_state: editForm.address_state?.trim() || null,
+        address_zip: editForm.address_zip?.trim() || null,
+        notes: editForm.notes?.trim() || null
+      });
+      success(t("customers.edit.updated") || "Customer updated");
+      setEditOpen(false);
+      setEditTarget(null);
+      fetchCustomers();
+    } catch (err) {
+      console.error("Customer update failed", err);
+      error(err.message || t("customers.edit.updateError") || "Failed to update customer");
+    } finally {
+      setEditSaving(false);
     }
   };
 
@@ -218,6 +309,9 @@ function Customers() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    {t("common.actions") || "Actions"}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -246,6 +340,31 @@ function Customers() {
                         <option value="Archived">Archived</option>
                       </select>
                     </td>
+                    <td className="px-6 py-4">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(c)}
+                        aria-label={t("customers.edit.title") || "Edit customer"}
+                        title={t("common.edit") || "Edit"}
+                        className="inline-flex items-center gap-1 text-terracotta hover:text-terracotta/80 text-sm font-medium"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                        <span>{t("common.edit") || "Edit"}</span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -253,6 +372,144 @@ function Customers() {
           </div>
         )}
       </div>
+
+      {/* Edit Customer Modal */}
+      <Modal
+        isOpen={editOpen}
+        onClose={closeEditModal}
+        title={t("customers.edit.title") || "Edit Customer"}
+        size="lg"
+      >
+        <form onSubmit={handleEditSave} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.firstName") || "First Name"}
+              </label>
+              <input
+                type="text"
+                value={editForm.first_name}
+                onChange={(e) => handleEditChange("first_name", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.lastName") || "Last Name"}
+              </label>
+              <input
+                type="text"
+                value={editForm.last_name}
+                onChange={(e) => handleEditChange("last_name", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.email") || "Email"}
+              </label>
+              <input
+                type="email"
+                value={editForm.email}
+                onChange={(e) => handleEditChange("email", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.phone") || "Phone"}
+              </label>
+              <input
+                type="tel"
+                value={editForm.phone}
+                onChange={(e) => handleEditChange("phone", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.address") || "Address"}
+              </label>
+              <input
+                type="text"
+                value={editForm.address_street}
+                onChange={(e) => handleEditChange("address_street", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.city") || "City"}
+              </label>
+              <input
+                type="text"
+                value={editForm.address_city}
+                onChange={(e) => handleEditChange("address_city", e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("customers.edit.state") || "State"}
+                </label>
+                <input
+                  type="text"
+                  value={editForm.address_state}
+                  onChange={(e) => handleEditChange("address_state", e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t("customers.edit.zip") || "ZIP"}
+                </label>
+                <input
+                  type="text"
+                  value={editForm.address_zip}
+                  onChange={(e) => handleEditChange("address_zip", e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+                />
+              </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("customers.edit.notes") || "Notes"}
+              </label>
+              <textarea
+                value={editForm.notes}
+                onChange={(e) => handleEditChange("notes", e.target.value)}
+                rows={3}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={closeEditModal}
+              disabled={editSaving}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-60"
+            >
+              {t("common.cancel") || "Cancel"}
+            </button>
+            <button
+              type="submit"
+              disabled={editSaving}
+              className={`px-4 py-2 rounded-md text-white font-medium ${
+                editSaving
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-terracotta hover:bg-terracotta/90"
+              }`}
+            >
+              {editSaving
+                ? (t("common.loading") || "Saving...")
+                : (t("customers.edit.save") || "Save Changes")}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

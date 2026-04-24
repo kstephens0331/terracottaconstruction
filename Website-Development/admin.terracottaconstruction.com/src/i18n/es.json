@@ -1,13 +1,22 @@
 {
   "dashboard": {
-  "welcome": "Bienvenido al panel de administración",
-  "intro": "Aquí puede administrar cotizaciones, órdenes de trabajo y clientes."
+    "welcome": "Bienvenido al panel de administración",
+    "intro": "Aquí puede administrar cotizaciones, órdenes de trabajo y clientes."
   },
   "login": {
     "title": "Portal de Administración",
     "prompt": "Por favor, inicie sesión para continuar",
     "button": "Iniciar sesión con Google",
-    "toggle": "Español / Inglés"
+    "toggle": "Español / Inglés",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "resetTitle": "Restablecer su contraseña",
+    "resetDescription": "Ingrese su correo de administrador y le enviaremos un enlace para restablecer su contraseña.",
+    "resetEmailLabel": "Correo electrónico",
+    "resetSend": "Enviar enlace",
+    "resetSending": "Enviando...",
+    "resetSuccess": "Revise su correo para ver el enlace de restablecimiento.",
+    "resetError": "No se pudo enviar el correo. Inténtelo nuevamente.",
+    "resetCancel": "Cancelar"
   },
   "nav": {
     "dashboard": "Tablero",
@@ -17,26 +26,193 @@
     "toggleLanguage": "English",
     "logout": "Cerrar sesión"
   },
-"quotes": {
-  "title": "Cotizaciones",
-  "customer": "Nombre del cliente",
-  "description": "Descripción del artículo",
-  "addItem": "Agregar línea",
-  "remove": "Eliminar",
-  "total": "Total",
-  "save": "Guardar cotización",
-  "send": "Enviar por correo"
-},
-"workOrders": {
-  "title": "Órdenes de trabajo",
-  "placeholder": "Aquí es donde creará y rastreará órdenes de trabajo para cada propiedad."
-},
-"customers": {
-  "title": "Clientes",
-  "placeholder": "Aquí puede administrar los detalles del cliente como nombre, contacto e historial de trabajos."
-},
-"notFound": {
-  "message": "Página no encontrada.",
-  "back": "Volver al Tablero"
-}
+  "workOrders": {
+    "title": "Órdenes de trabajo",
+    "placeholder": "Aquí es donde creará y rastreará órdenes de trabajo para cada propiedad."
+  },
+  "customers": {
+    "title": "Clientes",
+    "placeholder": "Aquí puede administrar los detalles del cliente como nombre, contacto e historial de trabajos.",
+    "edit": {
+      "title": "Editar cliente",
+      "save": "Guardar cambios",
+      "updated": "Cliente actualizado",
+      "updateError": "No se pudo actualizar el cliente",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "state": "Estado",
+      "zip": "Código postal",
+      "notes": "Notas"
+    }
+  },
+  "invoices": {
+    "fromQuote": {
+      "button": "+ Desde cotización",
+      "title": "Crear factura desde cotización",
+      "description": "Seleccione una cotización aprobada para convertirla en factura.",
+      "empty": "No hay cotizaciones aprobadas disponibles.",
+      "submit": "Crear factura",
+      "success": "Factura creada desde cotización",
+      "createError": "No se pudo crear la factura desde la cotización",
+      "loadError": "No se pudieron cargar las cotizaciones aprobadas"
+    }
+  },
+  "notFound": {
+    "message": "Página no encontrada.",
+    "back": "Volver al Tablero"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "loading": "Cargando",
+    "error": "Error",
+    "success": "Éxito",
+    "back": "Atrás",
+    "actions": "Acciones",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "yes": "Sí",
+    "no": "No",
+    "none": "Ninguno",
+    "all": "Todos",
+    "required": "Requerido"
+  },
+  "quotes": {
+    "title": "Cotizaciones",
+    "customer": "Nombre del cliente",
+    "description": "Descripción del artículo",
+    "addItem": "Agregar línea",
+    "remove": "Eliminar",
+    "total": "Total",
+    "save": "Guardar cotización",
+    "send": "Enviar por correo",
+    "list": {
+      "title": "Cotizaciones",
+      "newQuote": "Nueva cotización",
+      "empty": "Aún no hay cotizaciones. Cree su primera cotización.",
+      "loading": "Cargando cotizaciones...",
+      "errorLoading": "No se pudieron cargar las cotizaciones",
+      "filterStatus": "Filtrar por estado",
+      "searchCustomer": "Buscar cliente",
+      "allStatuses": "Todos los estados",
+      "from": "Desde",
+      "to": "Hasta",
+      "columns": {
+        "quoteNumber": "Cotización #",
+        "customer": "Cliente",
+        "title": "Título",
+        "status": "Estado",
+        "total": "Total",
+        "created": "Creada",
+        "actions": "Acciones"
+      },
+      "confirmDeleteTitle": "Eliminar cotización",
+      "confirmDeleteMessage": "¿Está seguro que desea eliminar esta cotización? Esta acción no se puede deshacer."
+    },
+    "create": {
+      "title": "Crear cotización",
+      "customerSection": "Cliente",
+      "detailsSection": "Detalles",
+      "lineItemsSection": "Líneas de detalle",
+      "totalsSection": "Totales",
+      "termsSection": "Términos y notas",
+      "selectCustomer": "Seleccione un cliente",
+      "addNewCustomer": "+ Agregar nuevo cliente",
+      "quoteTitle": "Título de la cotización",
+      "quoteTitlePlaceholder": "Título breve para esta cotización",
+      "quoteDescription": "Descripción",
+      "quoteDescriptionPlaceholder": "Descripción opcional",
+      "validUntil": "Válido hasta",
+      "item": "Artículo",
+      "service": "Servicio",
+      "customItem": "Artículo personalizado",
+      "itemDescription": "Descripción",
+      "quantity": "Cant.",
+      "unit": "Unidad",
+      "unitPrice": "Precio unitario",
+      "unitCost": "Costo unitario",
+      "itemTotal": "Total",
+      "addItem": "+ Agregar línea",
+      "removeItem": "Quitar",
+      "subtotal": "Subtotal",
+      "taxRate": "Impuesto (%)",
+      "taxAmount": "Impuesto",
+      "discount": "Descuento",
+      "grandTotal": "Total",
+      "margin": "Margen",
+      "marginWarning": "El margen está por debajo del umbral del {{threshold}}%",
+      "terms": "Términos",
+      "termsPlaceholder": "Términos de pago, garantía, etc.",
+      "notes": "Notas internas",
+      "notesPlaceholder": "Notas internas (no visibles para el cliente)",
+      "saveDraft": "Guardar borrador",
+      "saveAndSend": "Guardar y enviar",
+      "cancel": "Cancelar",
+      "validation": {
+        "customerRequired": "Por favor seleccione un cliente",
+        "titleRequired": "El título de la cotización es requerido",
+        "itemsRequired": "Se requiere al menos una línea de detalle",
+        "itemInvalid": "Cada línea requiere descripción, cantidad y precio unitario mayor a cero"
+      },
+      "created": "Cotización creada con éxito",
+      "createError": "No se pudo crear la cotización"
+    },
+    "edit": {
+      "title": "Editar cotización",
+      "save": "Guardar cambios",
+      "updated": "Cotización actualizada con éxito",
+      "updateError": "No se pudo actualizar la cotización"
+    },
+    "detail": {
+      "loading": "Cargando cotización...",
+      "errorLoading": "No se pudo cargar la cotización",
+      "notFound": "Cotización no encontrada",
+      "customerCard": "Cliente",
+      "datesCard": "Fechas",
+      "lineItemsCard": "Líneas de detalle",
+      "activityCard": "Actividad",
+      "activityEmpty": "Aún no hay actividad",
+      "created": "Creada",
+      "validUntil": "Válido hasta",
+      "sentAt": "Enviada",
+      "approvedAt": "Aprobada",
+      "revisionBanner": "El cliente ha solicitado una revisión",
+      "editToCreateNewVersion": "Editar para crear nueva versión",
+      "markAsSent": "Marcar como enviada",
+      "markAsApproved": "Marcar como aprobada",
+      "markAsRejected": "Marcar como rechazada",
+      "convertToInvoice": "Convertir a factura",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "statusUpdated": "Estado actualizado a {{status}}",
+      "statusUpdateError": "No se pudo actualizar el estado",
+      "invoiceCreated": "Factura creada desde cotización",
+      "invoiceCreateError": "No se pudo crear la factura",
+      "deleted": "Cotización eliminada",
+      "deleteError": "No se pudo eliminar la cotización",
+      "confirmSendTitle": "Enviar cotización",
+      "confirmSendMessage": "¿Marcar esta cotización como enviada? Esto notificará al cliente."
+    },
+    "status": {
+      "Draft": "Borrador",
+      "Pending": "Pendiente",
+      "Sent": "Enviada",
+      "Viewed": "Vista",
+      "Approved": "Aprobada",
+      "Rejected": "Rechazada",
+      "Revision Requested": "Revisión solicitada",
+      "Expired": "Expirada",
+      "Invoiced": "Facturada"
+    }
+  }
 }

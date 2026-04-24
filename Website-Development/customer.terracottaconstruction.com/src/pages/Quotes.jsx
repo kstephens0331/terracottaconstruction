@@ -4,11 +4,17 @@ import Sidebar from "../components/Sidebar";
 import jsPDF from "jspdf";
 import logoImage from "../assets/logo.jpg";
 
+const BACKEND_URL =
+  process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+
 function Quotes() {
   const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [revisionText, setRevisionText] = useState("");
+  const [revisionSubmitting, setRevisionSubmitting] = useState(false);
+  const [revisionError, setRevisionError] = useState("");
+  const [revisionSuccess, setRevisionSuccess] = useState("");
   const quoteRefs = useRef({});
 
   useEffect(() => {
@@ -24,6 +30,7 @@ function Quotes() {
           setQuotes(data);
         }
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error("Error loading quotes:", err);
       } finally {
         setLoading(false);
@@ -45,7 +52,7 @@ function Quotes() {
     doc.addImage(logo, "PNG", 10, 10, 40, 15);
 
     doc.setFontSize(18);
-    doc.setTextColor("#c1440e");
+    doc.setTextColor("#924C2E");
     doc.text("Official Quote", 60, 20);
 
     doc.setFontSize(12);
@@ -59,7 +66,7 @@ function Quotes() {
     doc.setTextColor("#333");
     doc.text("Title:", 10, 70);
     doc.setFontSize(10);
-    doc.text(quote.title || 'Quote', 10, 76, { maxWidth: 190 });
+    doc.text(quote.title || "Quote", 10, 76, { maxWidth: 190 });
 
     doc.setFontSize(10);
     doc.setTextColor("#999");
@@ -73,80 +80,165 @@ function Quotes() {
   };
 
   const handleRevisionSubmit = async () => {
-    if (!selectedQuote || !revisionText) return;
+    if (!selectedQuote || !revisionText.trim()) return;
+
+    setRevisionSubmitting(true);
+    setRevisionError("");
+    setRevisionSuccess("");
 
     try {
-      // For now, just show a success message since we don't have a quote_requests table
-      // The revision request can be implemented later with activity_log or a new table
-      alert("Revision request submitted. We will contact you shortly.");
+      const session = await auth.getSession();
+      if (!session || !session.access_token) {
+        setRevisionError(
+          "Your session has expired. Please log in again and retry."
+        );
+        setRevisionSubmitting(false);
+        return;
+      }
+
+      const response = await fetch(`${BACKEND_URL}/api/quote-revisions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          quoteId: selectedQuote.id,
+          message: revisionText.trim(),
+        }),
+      });
+
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (_parseErr) {
+        payload = null;
+      }
+
+      if (!response.ok || !payload || payload.success !== true) {
+        const msg =
+          (payload && payload.error) ||
+          `Request failed (HTTP ${response.status}).`;
+        setRevisionError(msg);
+        setRevisionSubmitting(false);
+        return;
+      }
+
       setSelectedQuote(null);
       setRevisionText("");
+      setRevisionSuccess(
+        "Revision request submitted. We will be in touch shortly."
+      );
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Revision submit error:", err);
-      alert("Failed to submit request.");
+      setRevisionError(
+        "We could not reach the server. Please check your connection and try again."
+      );
+    } finally {
+      setRevisionSubmitting(false);
     }
   };
 
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1 bg-gray-100 p-8 min-h-screen">
-        <div className="bg-white rounded-xl shadow p-6">
-          <h1 className="text-2xl font-semibold text-[#c1440e] mb-6 border-b pb-2">
-            Your Quotes
-          </h1>
+  const statusPill = (status) => {
+    const s = (status || "").toLowerCase();
+    if (s === "approved") return "bg-green-100 text-green-800";
+    if (s === "rejected" || s === "cancelled") return "bg-red-100 text-red-800";
+    return "bg-yellow-100 text-yellow-800";
+  };
 
-          {loading ? (
-            <p className="text-gray-500">Loading quotes...</p>
-          ) : quotes.length === 0 ? (
-            <p className="text-gray-500">No quotes available yet.</p>
-          ) : (
-            <ul className="space-y-6">
-              {quotes.map((quote) => (
-                <li
-                  key={quote.id}
-                  ref={(el) => (quoteRefs.current[quote.id] = el)}
-                  className="bg-gray-50 border p-4 rounded shadow-sm"
+  return (
+    <div className="flex min-h-screen bg-cream">
+      <Sidebar />
+      <main className="flex-1 p-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mb-6 border-b pb-4">
+              <h1 className="text-3xl md:text-4xl font-heading font-bold text-charcoal">
+                Your Quotes
+              </h1>
+              <p className="text-sm text-gray-600 font-body mt-1">
+                Review and download quotes from Terracotta Construction.
+              </p>
+            </div>
+
+            {revisionSuccess ? (
+              <div
+                role="status"
+                className="mb-6 flex items-start justify-between gap-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 font-body"
+              >
+                <span>{revisionSuccess}</span>
+                <button
+                  type="button"
+                  onClick={() => setRevisionSuccess("")}
+                  className="text-green-700 hover:text-green-900 font-semibold"
+                  aria-label="Dismiss"
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-gray-800 font-semibold mb-1">{quote.quote_number || `Quote #${quote.id.slice(0, 8)}`}</p>
-                      <p className="text-sm text-gray-600 mb-1">{quote.title}</p>
-                      <p className="text-sm text-gray-500 mb-2">
-                        Created: {new Date(quote.created_at).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm font-medium text-green-700">${(quote.total || 0).toFixed(2)}</p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <span
-                        className={`text-sm px-2 py-1 rounded-full ${
-                          quote.status === "Approved"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {quote.status}
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handlePDFDownload(quote.id)}
-                          className="text-sm bg-white border border-[#c1440e] text-[#c1440e] px-3 py-1 rounded hover:bg-[#c1440e] hover:text-white transition"
+                  &times;
+                </button>
+              </div>
+            ) : null}
+
+            {loading ? (
+              <p className="text-gray-600 font-body">Loading quotes...</p>
+            ) : quotes.length === 0 ? (
+              <p className="text-gray-600 font-body">
+                No quotes available yet.
+              </p>
+            ) : (
+              <ul className="space-y-6">
+                {quotes.map((quote) => (
+                  <li
+                    key={quote.id}
+                    ref={(el) => (quoteRefs.current[quote.id] = el)}
+                    className="bg-cream border border-gray-200 p-4 rounded-md"
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <p className="text-charcoal font-body font-semibold mb-1">
+                          {quote.quote_number ||
+                            `Quote #${quote.id.slice(0, 8)}`}
+                        </p>
+                        <p className="text-sm text-gray-700 font-body mb-1">
+                          {quote.title}
+                        </p>
+                        <p className="text-sm text-gray-600 font-body mb-2">
+                          Created:{" "}
+                          {new Date(quote.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm font-semibold text-charcoal font-body">
+                          ${(quote.total || 0).toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-right space-y-2">
+                        <span
+                          className={`text-xs px-3 py-1 rounded-full font-medium ${statusPill(
+                            quote.status
+                          )}`}
                         >
-                          Download PDF
-                        </button>
-                        <button
-                          onClick={() => setSelectedQuote(quote)}
-                          className="text-sm bg-yellow-200 text-yellow-800 px-3 py-1 rounded hover:bg-yellow-300"
-                        >
-                          Request Revision
-                        </button>
+                          {quote.status}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handlePDFDownload(quote.id)}
+                            className="text-sm bg-white border-2 border-terracotta text-terracotta px-3 py-1 rounded-md font-medium hover:bg-terracotta hover:text-white transition"
+                          >
+                            Download PDF
+                          </button>
+                          <button
+                            onClick={() => setSelectedQuote(quote)}
+                            className="text-sm bg-terracotta text-white px-3 py-1 rounded-md font-medium hover:bg-terracotta-dark transition"
+                          >
+                            Request Revision
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* Revision Modal */}
@@ -156,28 +248,40 @@ function Quotes() {
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
                 Request Revision for Quote #{selectedQuote.id}
               </h2>
+              {revisionError ? (
+                <div
+                  role="alert"
+                  className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 font-body"
+                >
+                  {revisionError}
+                </div>
+              ) : null}
               <textarea
                 className="w-full border border-gray-300 rounded px-4 py-2 mb-4"
                 rows={4}
                 value={revisionText}
                 onChange={(e) => setRevisionText(e.target.value)}
                 placeholder="Describe the changes you need..."
+                disabled={revisionSubmitting}
               />
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => {
                     setSelectedQuote(null);
                     setRevisionText("");
+                    setRevisionError("");
                   }}
-                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+                  disabled={revisionSubmitting}
+                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 disabled:opacity-60"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRevisionSubmit}
-                  className="bg-[#c1440e] text-white px-4 py-2 rounded hover:bg-orange-700"
+                  disabled={revisionSubmitting || !revisionText.trim()}
+                  className="bg-[#c1440e] text-white px-4 py-2 rounded hover:bg-orange-700 disabled:opacity-60"
                 >
-                  Submit
+                  {revisionSubmitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </div>

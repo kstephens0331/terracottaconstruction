@@ -4,71 +4,125 @@ import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
-import Quotes from "./pages/Quotes";
+import QuotesList from "./pages/QuotesList";
+import QuoteCreate from "./pages/QuoteCreate";
+import QuoteDetail from "./pages/QuoteDetail";
+import QuoteEdit from "./pages/QuoteEdit";
 import WorkOrders from "./pages/WorkOrders";
 import Customers from "./pages/Customers";
 import Invoices from "./pages/Invoices";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
+import AdminResetPassword from "./pages/AdminResetPassword";
 import Sidebar from "./components/Sidebar";
 import Toast from "./components/Toast";
+import Modal from "./components/Modal";
 import logo from "./assets/logo.png";
 
 function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pendingUserId, setPendingUserId] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  // Forgot-password modal state (admin login)
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
+
   const { t, i18n } = useTranslation();
 
-  // Check for existing session on mount
+  // Fetch profile when we have a pending user ID
   useEffect(() => {
-    const initAuth = async () => {
+    if (!pendingUserId) return;
+
+    let cancelled = false;
+
+    const fetchProfile = async () => {
+      console.log('Fetching profile for user:', pendingUserId);
       try {
-        const session = await auth.getSession();
-        if (session?.user) {
-          const userProfile = await auth.getProfile(session.user.id);
-          if (userProfile?.role === 'admin' || userProfile?.role === 'employee') {
-            setUser(session.user);
-            setProfile(userProfile);
-          } else {
-            // Not authorized
-            await auth.signOut();
-          }
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', pendingUserId)
+          .single();
+
+        if (cancelled) return;
+
+        console.log('Profile result:', profileError?.message || profileData?.role);
+
+        if (profileError) {
+          console.error('Profile error:', profileError.message);
+          setLoading(false);
+          setPendingUserId(null);
+          return;
+        }
+
+        if (profileData?.role === 'admin' || profileData?.role === 'employee') {
+          setProfile(profileData);
+          console.log('Profile loaded, authenticated');
+        } else {
+          console.log('Not authorized');
+          await auth.signOut();
+          setUser(null);
         }
       } catch (err) {
-        console.error('Auth init error:', err);
+        console.error('Profile fetch error:', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setPendingUserId(null);
+        }
       }
     };
 
-    initAuth();
+    // Small delay to ensure Supabase is ready
+    const timer = setTimeout(fetchProfile, 50);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [pendingUserId]);
 
-    // Listen for auth changes
-    const { data: { subscription } } = auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          const userProfile = await auth.getProfile(session.user.id);
-          if (userProfile?.role === 'admin' || userProfile?.role === 'employee') {
-            setUser(session.user);
-            setProfile(userProfile);
-          } else {
-            setError("Access denied. Admin privileges required.");
-            await auth.signOut();
-          }
-        } catch (err) {
-          console.error('Profile fetch error:', err);
+  // Listen for auth changes
+  useEffect(() => {
+    let isMounted = true;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event, session?.user?.email);
+
+      if (!isMounted) return;
+
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        if (session?.user) {
+          console.log('Setting user and triggering profile fetch');
+          setUser(session.user);
+          setPendingUserId(session.user.id);
+        } else {
+          console.log('No user in session');
+          setLoading(false);
         }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setProfile(null);
+        setLoading(false);
+        setPendingUserId(null);
+      } else if (event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          setUser(session.user);
+        }
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleLogin = async (e) => {
@@ -108,8 +162,46 @@ function App() {
     i18n.changeLanguage(newLang);
   };
 
-  // Show loading spinner while checking auth
-  if (loading && !user) {
+  const openForgot = () => {
+    setResetEmail(email);
+    setResetError("");
+    setResetSuccess(false);
+    setForgotOpen(true);
+  };
+
+  const closeForgot = () => {
+    setForgotOpen(false);
+    setResetLoading(false);
+  };
+
+  const handleSendReset = async (e) => {
+    e.preventDefault();
+    setResetError("");
+    setResetLoading(true);
+    try {
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(
+        resetEmail,
+        { redirectTo: window.location.origin + '/admin-reset' }
+      );
+      if (resetErr) throw resetErr;
+      setResetSuccess(true);
+    } catch (err) {
+      console.error("Password reset error:", err);
+      setResetError(err.message || t("login.resetError"));
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  // `/admin-reset` must be reachable without an admin session because the
+  // user arrives there from a password-reset email while signed out.
+  // We short-circuit render before the auth gate below.
+  if (typeof window !== "undefined" && window.location.pathname === "/admin-reset") {
+    return <AdminResetPassword />;
+  }
+
+  // Show loading spinner while checking auth or loading profile
+  if (loading || (user && !profile)) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-terracotta"></div>
@@ -117,7 +209,7 @@ function App() {
     );
   }
 
-  if (!user) {
+  if (!user || !profile) {
     return (
       <div className="min-h-screen bg-white text-charcoal font-body px-4">
         <header className="flex flex-col items-center justify-center py-6 border-b border-gray-200">
@@ -166,6 +258,16 @@ function App() {
               {loading ? "Signing in..." : t("login.button")}
             </button>
 
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={openForgot}
+                className="text-sm text-terracotta hover:underline font-medium"
+              >
+                {t("login.forgotPassword")}
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={toggleLanguage}
@@ -175,6 +277,61 @@ function App() {
             </button>
           </form>
         </main>
+
+        <Modal
+          isOpen={forgotOpen}
+          onClose={closeForgot}
+          title={t("login.resetTitle")}
+          size="sm"
+        >
+          {resetSuccess ? (
+            <div className="bg-green-50 border border-green-200 text-green-800 rounded px-4 py-3 text-sm mb-4">
+              {t("login.resetSuccess")}
+            </div>
+          ) : (
+            <form onSubmit={handleSendReset} className="space-y-4">
+              <p className="text-sm text-gray-600">
+                {t("login.resetDescription")}
+              </p>
+
+              {resetError && (
+                <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded text-sm">
+                  {resetError}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-1">
+                  {t("login.resetEmailLabel")}
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-terracotta"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={closeForgot}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+                >
+                  {t("login.resetCancel")}
+                </button>
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className="px-4 py-2 bg-terracotta text-white rounded font-medium hover:bg-terracotta/90 transition disabled:opacity-50"
+                >
+                  {resetLoading ? t("login.resetSending") : t("login.resetSend")}
+                </button>
+              </div>
+            </form>
+          )}
+        </Modal>
       </div>
     );
   }
@@ -187,7 +344,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={<Dashboard user={profile} />} />
-            <Route path="/quotes" element={<Quotes />} />
+            <Route path="/quotes" element={<QuotesList />} />
+            <Route path="/quotes/new" element={<QuoteCreate />} />
+            <Route path="/quotes/:id" element={<QuoteDetail />} />
+            <Route path="/quotes/:id/edit" element={<QuoteEdit />} />
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/invoices" element={<Invoices />} />
