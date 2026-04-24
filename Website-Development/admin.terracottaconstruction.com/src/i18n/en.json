@@ -21,10 +21,43 @@
   "nav": {
     "dashboard": "Dashboard",
     "quotes": "Quotes",
+    "smartEstimate": "Smart Estimate",
     "workOrders": "Work Orders",
     "customers": "Customers",
     "toggleLanguage": "Español",
     "logout": "Logout"
+  },
+  "smartEstimate": {
+    "list": {
+      "title": "Smart Estimates",
+      "new": "+ New Smart Estimate",
+      "empty": "No estimates yet",
+      "emptyHint": "Generate your first Smart Estimate from a photo and short description."
+    },
+    "create": {
+      "title": "New Smart Estimate",
+      "uploadPhotos": "Upload photos",
+      "dropPhotos": "Drag & drop photos here, or click to select. Max 5 photos, 5MB each.",
+      "description": "Project description",
+      "descriptionPlaceholder": "Replace 80ft of cedar privacy fence with two single gates. Take down old chain link.",
+      "zipCode": "Zip code",
+      "customer": "Customer (optional)",
+      "projectType": "Project type (optional)",
+      "generate": "Generate Estimate",
+      "generating": "Analyzing photos...",
+      "disclaimer": "Preliminary estimate — subject to on-site review.",
+      "saveAsDraft": "Edit & Save as Draft Quote",
+      "discard": "Discard",
+      "zone": "Pricing zone",
+      "confidence": "Confidence",
+      "summary": "AI summary",
+      "scope": "Identified scope",
+      "laborHours": "Estimated labor hours",
+      "lineItems": "Line items",
+      "warnings": "Warnings",
+      "confirmCustomer": "Select customer for this quote",
+      "outsideArea": "Zip not in service area — please verify"
+    }
   },
   "workOrders": {
     "title": "Work Orders",

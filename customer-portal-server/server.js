@@ -16,6 +16,9 @@ const { sendEmail } = require('./lib/email');
 const { renderTemplate, templates } = require('./lib/templates');
 const { verifyCustomer, verifyAdmin } = require('./middleware/auth');
 
+const estimatesRouter = require('./routes/estimates');
+const pricingRouter = require('./routes/pricing');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -74,7 +77,7 @@ const emailLimiter = rateLimit({
 app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
-    version: '2.0.0',
+    version: '2.1.0',
     timestamp: new Date().toISOString(),
   });
 });
@@ -397,6 +400,13 @@ app.post('/api/admin/notify-work-order', emailLimiter, verifyAdmin, async (req, 
 });
 
 // ---------------------------------------------------------------------------
+// Smart Estimate + Pricing routers
+// ---------------------------------------------------------------------------
+
+app.use('/api/admin/estimates', estimatesRouter);
+app.use('/api/admin/pricing', pricingRouter);
+
+// ---------------------------------------------------------------------------
 // Dev-only template preview
 // ---------------------------------------------------------------------------
 
@@ -497,7 +507,7 @@ app.use((err, _req, res, _next) => {
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(`[customer-portal-server] v2.0.0 listening on port ${PORT} (${NODE_ENV})`);
+  console.log(`[customer-portal-server] v2.1.0 listening on port ${PORT} (${NODE_ENV})`);
 });
 
 module.exports = app;

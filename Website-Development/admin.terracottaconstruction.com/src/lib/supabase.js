@@ -3,9 +3,35 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase environment variables');
+}
+
+// Authed fetch helper for the admin Express backend.
+// Pulls the current Supabase session JWT and attaches it as a Bearer token.
+async function authedFetch(path, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = {
+    ...(options.headers || {}),
+    Authorization: `Bearer ${session?.access_token}`,
+  };
+  if (options.body && !(options.body instanceof FormData)) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+  }
+  const res = await fetch(`${BACKEND_URL}${path}`, { ...options, headers });
+  if (!res.ok) {
+    let msg = `Request failed (${res.status})`;
+    try {
+      const body = await res.json();
+      msg = body.error || body.message || msg;
+    } catch (_e) {
+      // body wasn't JSON; keep default message
+    }
+    throw new Error(msg);
+  }
+  return res.json();
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -520,6 +546,47 @@ export const db = {
         totalRevenue
       };
     }
+  },
+
+  // Smart Estimates (AI-generated preliminary quotes)
+  estimates: {
+    getAll: async () => {
+      const { data, error } = await supabase
+        .from('estimates')
+        .select('*, customer:customers(id, first_name, last_name, email), zone:pricing_zones(id, name, multiplier), converted_quote:quotes(id, quote_number)')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    getById: async (id) => {
+      const { data, error } = await supabase
+        .from('estimates')
+        .select('*, customer:customers(*), zone:pricing_zones(*), converted_quote:quotes(id, quote_number)')
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    create: async (formData) =>
+      authedFetch('/api/admin/estimates', { method: 'POST', body: formData }),
+    discard: async (id) =>
+      authedFetch(`/api/admin/estimates/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'discarded' }),
+      }),
+    convert: async (id, payload) =>
+      authedFetch(`/api/admin/estimates/${id}/convert`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+  },
+
+  // Pricing zones / baselines (admin backend)
+  pricing: {
+    getZones: async () => authedFetch('/api/admin/pricing/zones'),
+    getBaselines: async () => authedFetch('/api/admin/pricing/baselines'),
+    resolveZone: async (zip) =>
+      authedFetch(`/api/admin/pricing/resolve-zone?zip=${encodeURIComponent(zip)}`),
   }
 };
 

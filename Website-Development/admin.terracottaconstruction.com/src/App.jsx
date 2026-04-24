@@ -12,6 +12,8 @@ import WorkOrders from "./pages/WorkOrders";
 import Customers from "./pages/Customers";
 import Invoices from "./pages/Invoices";
 import Analytics from "./pages/Analytics";
+import SmartEstimate from "./pages/SmartEstimate";
+import SmartEstimatesList from "./pages/SmartEstimatesList";
 import NotFound from "./pages/NotFound";
 import AdminResetPassword from "./pages/AdminResetPassword";
 import Sidebar from "./components/Sidebar";
@@ -352,6 +354,9 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/smart-estimate" element={<SmartEstimatesList />} />
+            <Route path="/smart-estimate/new" element={<SmartEstimate />} />
+            <Route path="/smart-estimate/:id" element={<SmartEstimate readOnly />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

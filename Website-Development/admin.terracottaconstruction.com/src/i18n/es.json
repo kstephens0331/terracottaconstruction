@@ -21,10 +21,43 @@
   "nav": {
     "dashboard": "Tablero",
     "quotes": "Cotizaciones",
+    "smartEstimate": "Estimación Inteligente",
     "workOrders": "Órdenes de trabajo",
     "customers": "Clientes",
     "toggleLanguage": "English",
     "logout": "Cerrar sesión"
+  },
+  "smartEstimate": {
+    "list": {
+      "title": "Estimaciones Inteligentes",
+      "new": "+ Nueva Estimación",
+      "empty": "Aún no hay estimaciones",
+      "emptyHint": "Genere su primera Estimación Inteligente a partir de una foto y descripción breve."
+    },
+    "create": {
+      "title": "Nueva Estimación Inteligente",
+      "uploadPhotos": "Subir fotos",
+      "dropPhotos": "Arrastre y suelte fotos aquí, o haga clic para seleccionar. Máximo 5 fotos, 5MB cada una.",
+      "description": "Descripción del proyecto",
+      "descriptionPlaceholder": "Reemplazar 80ft de cerca de privacidad de cedro con dos puertas...",
+      "zipCode": "Código postal",
+      "customer": "Cliente (opcional)",
+      "projectType": "Tipo de proyecto (opcional)",
+      "generate": "Generar Estimación",
+      "generating": "Analizando fotos...",
+      "disclaimer": "Estimación preliminar — sujeta a revisión en sitio.",
+      "saveAsDraft": "Editar y Guardar como Borrador de Cotización",
+      "discard": "Descartar",
+      "zone": "Zona de precios",
+      "confidence": "Confianza",
+      "summary": "Resumen de IA",
+      "scope": "Alcance identificado",
+      "laborHours": "Horas de trabajo estimadas",
+      "lineItems": "Elementos",
+      "warnings": "Advertencias",
+      "confirmCustomer": "Seleccionar cliente para esta cotización",
+      "outsideArea": "Código postal fuera del área de servicio — por favor verifique"
+    }
   },
   "workOrders": {
     "title": "Órdenes de trabajo",
