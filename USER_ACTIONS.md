@@ -16,6 +16,17 @@ The customer-portal-server now sends every transactional email through Resend.
 
 ---
 
+## 1b. Google Gemini (Smart Estimate vision)
+
+The Smart Estimate module uses Gemini 2.0 Flash to analyze photos.
+
+- [ ] Sign in at https://aistudio.google.com/apikey with a Google account.
+- [ ] Click "Create API key" -> select or create a Google Cloud project (free tier is plenty for this).
+- [ ] Save the key. You'll paste it in the next step.
+- [ ] (Optional) Set a budget alert in Google Cloud Console; expected spend is ~$0.01-0.03 per estimate.
+
+---
+
 ## 2. `customer-portal-server/.env` (backend secrets)
 
 Copy from the template and fill in real values. **Never commit this file** (already gitignored).
@@ -39,6 +50,11 @@ Then edit `.env`:
 | `ADMIN_PORTAL_URL` | `https://admin.terracottaconstruction.com` |
 | `PORT` | `5000` (local dev only — Vercel ignores this) |
 | `NODE_ENV` | `production` for Vercel; `development` locally |
+| `GEMINI_API_KEY` | The key from Step 1b. |
+| `GEMINI_MODEL` | `gemini-2.0-flash` (default) |
+| `MAX_PHOTOS` | `5` (default) |
+| `MAX_PHOTO_SIZE_MB` | `5` (default) |
+| `ESTIMATE_RATE_LIMIT_PER_HOUR` | `30` (per admin user) |
 
 ---
 
@@ -72,7 +88,8 @@ Add every variable from Step 2 (except `PORT`).
 Add the three `REACT_APP_*` variables from Step 3.
 
 ### Admin portal project (`admin.terracottaconstruction.com`)
-No new variables required. Existing `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` cover the new admin code.
+- Existing: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (already configured).
+- **NEW for Smart Estimate**: `VITE_BACKEND_URL` = `https://customer-server-tc.vercel.app` (production) — the admin frontend now calls the backend for the Smart Estimate flow.
 
 ---
 
@@ -164,6 +181,16 @@ Verify the full flow in production:
 - [ ] Log back in as test customer -> see the quote -> click "Request Revision" -> enter message.
 - [ ] Verify admin (`terracottaconstruction@gmail.com`) receives branded "Revision requested" email.
 - [ ] Quote status updates to "Revision Requested" with the customer's message visible in admin Quote Detail.
+
+**Smart Estimate (admin)**
+- [ ] Admin portal -> Smart Estimate -> + New Smart Estimate.
+- [ ] Drop in 1-3 photos of any project (e.g., a fence, a yard, a wall).
+- [ ] Type a short description (e.g., "Replace 80ft of cedar privacy fence + two gates").
+- [ ] Enter zip 77316 (Conroe corridor) -> verify zone preview shows "Conroe / Woodlands corridor (1.05x)".
+- [ ] Optionally pick a customer.
+- [ ] Click Generate Estimate. Within ~10s, line items + subtotal appear with the disclaimer banner.
+- [ ] Click Edit & Save as Draft Quote -> pick customer if needed -> verify it lands you in /quotes/:id/edit with the items pre-populated.
+- [ ] Open /smart-estimate -> verify the estimate shows in the list with status "Converted" and a link to the new quote.
 
 ---
 
