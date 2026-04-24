@@ -1,25 +1,21 @@
 // lib/gemini.js
 // Vision + scope-extraction wrapper around Google Gemini.
 //
-// Exports a single function: analyzeProject({ photoBase64Array, description,
-// projectType, knownItemKeys }). Returns a normalized object with summary,
-// confidence, identified_scope, estimated_labor_hours, notes, items[], raw.
+// Pattern matches G:/StephensCode/aishapodcast/src/services/imageGenerationService.ts:
+// direct REST call against generativelanguage.googleapis.com via fetch, no SDK.
 //
-// SDK strategy:
-//   - Prefer the new official @google/genai package.
-//   - Fall back to the legacy @google/generative-ai package if the new one
-//     is not installed.
-//   - Only require() either SDK lazily inside the call so importing this file
-//     never throws.
+// Exports analyzeProject({ photoBase64Array, description, projectType, knownItemKeys }).
+// Returns a normalized object with summary, confidence, identified_scope,
+// estimated_labor_hours, notes, items[], raw.
 //
-// API key is read from GEMINI_API_KEY at call time (so the server boots
-// cleanly without it). Model defaults to gemini-2.0-flash, override via
-// GEMINI_MODEL.
+// API key is read from GEMINI_API_KEY at call time (server boots cleanly without it).
+// Model defaults to gemini-2.0-flash, override via GEMINI_MODEL.
 
 const DEFAULT_MODEL = 'gemini-2.0-flash';
 const TIMEOUT_MS = 30_000;
+const ENDPOINT_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-// JSON schema describing exactly what we want Gemini to return.
+// Schema describing exactly what we want Gemini to return.
 const RESPONSE_SCHEMA = {
   type: 'object',
   properties: {
@@ -95,45 +91,10 @@ function buildUserText(description, projectType) {
 
 function isTransient5xx(err) {
   if (!err) return false;
-  const status = err.status || err.statusCode || (err.response && err.response.status);
+  const status = err.status;
   if (typeof status === 'number') return status >= 500 && status < 600;
   const msg = String(err.message || '').toLowerCase();
   return /5\d\d|timeout|deadline|unavailable|temporar/.test(msg);
-}
-
-function withTimeout(promise, ms) {
-  return new Promise((resolve, reject) => {
-    const t = setTimeout(() => {
-      reject(new Error(`Gemini request timed out after ${ms}ms`));
-    }, ms);
-    promise
-      .then((v) => {
-        clearTimeout(t);
-        resolve(v);
-      })
-      .catch((e) => {
-        clearTimeout(t);
-        reject(e);
-      });
-  });
-}
-
-function tryRequireGenAI() {
-  try {
-    // New official SDK: https://www.npmjs.com/package/@google/genai
-    return { kind: 'genai', mod: require('@google/genai') };
-  } catch (e1) {
-    try {
-      return {
-        kind: 'generative-ai',
-        mod: require('@google/generative-ai'),
-      };
-    } catch (e2) {
-      throw new Error(
-        'No Google Gemini SDK installed. Install @google/genai (preferred) or @google/generative-ai.'
-      );
-    }
-  }
 }
 
 function normalizeResult(parsed, raw) {
@@ -164,82 +125,71 @@ function normalizeResult(parsed, raw) {
   };
 }
 
-function extractTextFromGenAIResponse(resp) {
-  // The new SDK returns a response object with .text (string) or candidates.
-  if (!resp) return '';
-  if (typeof resp.text === 'string') return resp.text;
-  if (typeof resp.text === 'function') {
-    try { return resp.text(); } catch (_) { /* fallthrough */ }
-  }
-  const candidates = resp.candidates || (resp.response && resp.response.candidates);
-  if (Array.isArray(candidates) && candidates.length) {
-    const parts = candidates[0].content && candidates[0].content.parts;
-    if (Array.isArray(parts)) {
-      return parts.map((p) => p.text || '').join('');
-    }
-  }
-  return '';
+function extractTextFromResponse(resp) {
+  if (!resp || !Array.isArray(resp.candidates) || !resp.candidates.length) return '';
+  const parts = resp.candidates[0].content && resp.candidates[0].content.parts;
+  if (!Array.isArray(parts)) return '';
+  return parts.map((p) => (typeof p.text === 'string' ? p.text : '')).join('');
 }
 
-async function callGenAI({ apiKey, model, systemInstruction, userText, photoBase64Array }) {
-  const { GoogleGenAI } = require('@google/genai');
-  const ai = new GoogleGenAI({ apiKey });
+async function callGemini({ apiKey, model, systemInstruction, userText, photoBase64Array }) {
+  const url = `${ENDPOINT_BASE}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
   const parts = [{ text: userText }];
   for (const b64 of photoBase64Array) {
     parts.push({
-      inlineData: {
-        mimeType: b64.mimeType || 'image/jpeg',
+      inline_data: {
+        mime_type: b64.mimeType || 'image/jpeg',
         data: b64.data,
       },
     });
   }
 
-  const request = {
-    model,
+  const body = {
+    system_instruction: { parts: [{ text: systemInstruction }] },
     contents: [{ role: 'user', parts }],
-    config: {
-      systemInstruction,
-      responseMimeType: 'application/json',
-      responseSchema: RESPONSE_SCHEMA,
+    generation_config: {
+      response_mime_type: 'application/json',
+      response_schema: RESPONSE_SCHEMA,
       temperature: 0.2,
     },
   };
 
-  const resp = await ai.models.generateContent(request);
-  const text = extractTextFromGenAIResponse(resp);
-  return { text, raw: resp };
-}
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-async function callLegacy({ apiKey, model, systemInstruction, userText, photoBase64Array }) {
-  const { GoogleGenerativeAI } = require('@google/generative-ai');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const m = genAI.getGenerativeModel({
-    model,
-    systemInstruction,
-    generationConfig: {
-      responseMimeType: 'application/json',
-      responseSchema: RESPONSE_SCHEMA,
-      temperature: 0.2,
-    },
-  });
-
-  const parts = [{ text: userText }];
-  for (const b64 of photoBase64Array) {
-    parts.push({
-      inlineData: {
-        mimeType: b64.mimeType || 'image/jpeg',
-        data: b64.data,
-      },
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
     });
+  } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      const e = new Error(`Gemini request timed out after ${TIMEOUT_MS}ms`);
+      e.status = 504;
+      throw e;
+    }
+    throw err;
+  }
+  clearTimeout(timeout);
+
+  const raw = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const apiMsg =
+      (raw && raw.error && raw.error.message) ||
+      `Gemini API error ${response.status}`;
+    const e = new Error(apiMsg);
+    e.status = response.status;
+    e.body = raw;
+    throw e;
   }
 
-  const result = await m.generateContent({ contents: [{ role: 'user', parts }] });
-  const text =
-    (result && result.response && typeof result.response.text === 'function'
-      ? result.response.text()
-      : '') || '';
-  return { text, raw: result && result.response ? result.response : result };
+  return { text: extractTextFromResponse(raw), raw };
 }
 
 async function analyzeProject({
@@ -263,27 +213,23 @@ async function analyzeProject({
   const systemInstruction = buildSystemInstruction(knownItemKeys);
   const userText = buildUserText(description, projectType);
 
-  const sdk = tryRequireGenAI();
-
-  const doCall = async () => {
-    if (sdk.kind === 'genai') {
-      return callGenAI({ apiKey, model, systemInstruction, userText, photoBase64Array });
-    }
-    return callLegacy({ apiKey, model, systemInstruction, userText, photoBase64Array });
-  };
-
   let lastErr = null;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const { text, raw } = await withTimeout(doCall(), TIMEOUT_MS);
+      const { text, raw } = await callGemini({
+        apiKey,
+        model,
+        systemInstruction,
+        userText,
+        photoBase64Array,
+      });
       if (!text) {
         throw new Error('Gemini returned an empty response');
       }
       let parsed;
       try {
         parsed = JSON.parse(text);
-      } catch (parseErr) {
-        // Try to salvage JSON if the model wrapped it.
+      } catch (_parseErr) {
         const match = text.match(/\{[\s\S]*\}/);
         if (!match) {
           throw new Error('Gemini response was not valid JSON');
@@ -294,7 +240,6 @@ async function analyzeProject({
     } catch (err) {
       lastErr = err;
       if (attempt === 0 && isTransient5xx(err)) {
-        // brief backoff then retry once
         await new Promise((r) => setTimeout(r, 500));
         continue;
       }
@@ -306,6 +251,5 @@ async function analyzeProject({
 
 module.exports = {
   analyzeProject,
-  // Exposed for tests / debugging.
   _internal: { RESPONSE_SCHEMA, buildSystemInstruction, buildUserText, normalizeResult },
 };
