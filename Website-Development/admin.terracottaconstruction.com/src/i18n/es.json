@@ -28,11 +28,15 @@
   },
   "workOrders": {
     "title": "Órdenes de trabajo",
-    "placeholder": "Aquí es donde creará y rastreará órdenes de trabajo para cada propiedad."
+    "placeholder": "Aquí es donde creará y rastreará órdenes de trabajo para cada propiedad.",
+    "empty": "Aún no hay órdenes de trabajo",
+    "emptyHint": "Envíe una orden de trabajo usando el formulario de arriba para comenzar."
   },
   "customers": {
     "title": "Clientes",
     "placeholder": "Aquí puede administrar los detalles del cliente como nombre, contacto e historial de trabajos.",
+    "empty": "Aún no hay clientes",
+    "emptyHint": "Agregue su primer cliente usando el formulario de arriba.",
     "edit": {
       "title": "Editar cliente",
       "save": "Guardar cambios",
@@ -50,6 +54,9 @@
     }
   },
   "invoices": {
+    "title": "Facturas",
+    "empty": "Aún no hay facturas",
+    "emptyHint": "Las facturas se crean a partir de cotizaciones aprobadas.",
     "fromQuote": {
       "button": "+ Desde cotización",
       "title": "Crear factura desde cotización",
@@ -59,6 +66,25 @@
       "success": "Factura creada desde cotización",
       "createError": "No se pudo crear la factura desde la cotización",
       "loadError": "No se pudieron cargar las cotizaciones aprobadas"
+    }
+  },
+  "analytics": {
+    "title": "Panel de Análisis",
+    "loadError": "No se pudieron cargar los análisis",
+    "retry": "Reintentar",
+    "revenueTrend": "Tendencia de Ingresos (Últimos 12 meses)",
+    "revenueLabel": "Ingresos",
+    "revenueEmpty": "No se registraron pagos en los últimos 12 meses.",
+    "workOrderStatus": "Estado de Órdenes de Trabajo",
+    "workOrderEmpty": "Aún no hay órdenes de trabajo registradas.",
+    "topCustomers": "Top 5 Clientes (Cotizaciones Aprobadas)",
+    "topCustomersEmpty": "Aún no hay cotizaciones aprobadas.",
+    "approvedTotal": "Total Aprobado",
+    "kpi": {
+      "totalCustomers": "Clientes Totales",
+      "totalRevenue": "Ingresos Totales",
+      "outstandingBalance": "Saldo Pendiente",
+      "pendingQuotes": "Cotizaciones Pendientes"
     }
   },
   "notFound": {
@@ -99,7 +125,8 @@
     "list": {
       "title": "Cotizaciones",
       "newQuote": "Nueva cotización",
-      "empty": "Aún no hay cotizaciones. Cree su primera cotización.",
+      "empty": "Aún no hay cotizaciones",
+      "emptyHint": "Cree su primera cotización para empezar a rastrear estimaciones.",
       "loading": "Cargando cotizaciones...",
       "errorLoading": "No se pudieron cargar las cotizaciones",
       "filterStatus": "Filtrar por estado",

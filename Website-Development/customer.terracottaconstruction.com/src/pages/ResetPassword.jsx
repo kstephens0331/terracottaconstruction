@@ -91,7 +91,9 @@ function ResetPassword() {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center px-4">
         <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md text-center">
-          <p className="text-charcoal">Loading...</p>
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
+          </div>
         </div>
       </div>
     );

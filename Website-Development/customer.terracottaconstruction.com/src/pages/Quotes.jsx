@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { auth, db } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import Banner from "../components/Banner";
 import jsPDF from "jspdf";
 import logoImage from "../assets/logo.jpg";
 
@@ -162,29 +163,41 @@ function Quotes() {
               </p>
             </div>
 
-            {revisionSuccess ? (
-              <div
-                role="status"
-                className="mb-6 flex items-start justify-between gap-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 font-body"
-              >
-                <span>{revisionSuccess}</span>
-                <button
-                  type="button"
-                  onClick={() => setRevisionSuccess("")}
-                  className="text-green-700 hover:text-green-900 font-semibold"
-                  aria-label="Dismiss"
-                >
-                  &times;
-                </button>
-              </div>
-            ) : null}
+            <Banner
+              type="success"
+              message={revisionSuccess}
+              onDismiss={() => setRevisionSuccess("")}
+            />
 
             {loading ? (
-              <p className="text-gray-600 font-body">Loading quotes...</p>
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
+              </div>
             ) : quotes.length === 0 ? (
-              <p className="text-gray-600 font-body">
-                No quotes available yet.
-              </p>
+              <div className="bg-cream border border-gray-200 rounded-md py-12 px-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-terracotta/10">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6 text-terracotta"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-heading font-semibold text-charcoal mb-2">
+                  No quotes yet
+                </h3>
+                <p className="text-sm text-gray-600 font-body">
+                  Your account manager will send your first quote soon. You will
+                  see it here when it arrives.
+                </p>
+              </div>
             ) : (
               <ul className="space-y-6">
                 {quotes.map((quote) => (
@@ -248,14 +261,8 @@ function Quotes() {
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
                 Request Revision for Quote #{selectedQuote.id}
               </h2>
-              {revisionError ? (
-                <div
-                  role="alert"
-                  className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 font-body"
-                >
-                  {revisionError}
-                </div>
-              ) : null}
+              <Banner type="error" message={revisionError} />
+
               <textarea
                 className="w-full border border-gray-300 rounded px-4 py-2 mb-4"
                 rows={4}

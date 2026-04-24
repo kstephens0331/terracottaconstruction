@@ -294,11 +294,43 @@ function Customers() {
           <h2 className="text-lg font-semibold">Customer List</h2>
         </div>
         {fetchLoading ? (
-          <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-terracotta"></div>
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
           </div>
         ) : customers.length === 0 ? (
-          <p className="text-gray-500 p-6">No customers found.</p>
+          <div className="p-12 text-center">
+            <svg
+              className="w-12 h-12 mx-auto text-gray-300 mb-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-7a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <p className="text-gray-700 font-medium mb-1">
+              {t("customers.empty") || "No customers yet"}
+            </p>
+            <p className="text-sm text-gray-500 mb-4">
+              {t("customers.emptyHint") ||
+                "Add your first customer using the form above."}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.querySelector('input[placeholder^="First Name"]');
+                if (el) el.focus();
+              }}
+              className="inline-flex items-center bg-terracotta hover:bg-terracotta/90 text-white px-4 py-2 rounded-md font-medium transition"
+            >
+              + New Customer
+            </button>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

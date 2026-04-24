@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, supabase } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import Banner from "../components/Banner";
 
 const PHONE_REGEX = /^[\d\s\-\+\(\)]{7,}$/;
 
@@ -197,40 +198,22 @@ function Settings() {
               )}
             </div>
 
-            {error && (
-              <div className="mb-4 flex items-start justify-between gap-4 bg-red-600 text-white px-4 py-3 rounded-md">
-                <span className="text-sm font-body">{error}</span>
-                <button
-                  onClick={() => setError("")}
-                  className="text-white font-bold hover:opacity-80"
-                  aria-label="Dismiss error"
-                >
-                  x
-                </button>
-              </div>
-            )}
-
-            {successMessage && (
-              <div className="mb-4 flex items-start justify-between gap-4 bg-green-100 text-green-800 px-4 py-3 rounded-md">
-                <span className="text-sm font-body">{successMessage}</span>
-                <button
-                  onClick={() => setSuccessMessage("")}
-                  className="text-green-800 font-bold hover:opacity-80"
-                  aria-label="Dismiss message"
-                >
-                  x
-                </button>
-              </div>
-            )}
-
-            {validationError && (
-              <div className="mb-4 bg-red-100 text-red-800 px-4 py-3 rounded-md text-sm font-body">
-                {validationError}
-              </div>
-            )}
+            <Banner
+              type="error"
+              message={error}
+              onDismiss={() => setError("")}
+            />
+            <Banner
+              type="success"
+              message={successMessage}
+              onDismiss={() => setSuccessMessage("")}
+            />
+            <Banner type="error" message={validationError} />
 
             {loading ? (
-              <p className="text-gray-600 font-body">Loading profile...</p>
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
+              </div>
             ) : !profile ? (
               <p className="text-gray-600 font-body">No profile available.</p>
             ) : editMode ? (

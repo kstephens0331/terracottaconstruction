@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { auth, db } from "../supabase";
 import Sidebar from "../components/Sidebar";
 
@@ -64,7 +65,9 @@ function Home() {
             </div>
 
             {loading ? (
-              <p className="text-gray-600 font-body">Loading...</p>
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
+              </div>
             ) : (
               <>
                 {/* Quotes */}
@@ -73,9 +76,27 @@ function Home() {
                     Recent Quotes
                   </h2>
                   {quotes.length === 0 ? (
-                    <p className="text-gray-600 font-body">
-                      No quotes available.
-                    </p>
+                    <div className="bg-cream border border-gray-200 rounded-md py-8 px-6 text-center">
+                      <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-terracotta/10">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-5 w-5 text-terracotta"
+                          aria-hidden="true"
+                        >
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-600 font-body">
+                        No quotes yet. Your account manager will send your first
+                        quote soon.
+                      </p>
+                    </div>
                   ) : (
                     <ul className="space-y-4">
                       {quotes.map((quote) => (
@@ -113,9 +134,18 @@ function Home() {
                     Active Work Orders
                   </h2>
                   {workOrders.length === 0 ? (
-                    <p className="text-gray-600 font-body">
-                      No active work orders.
-                    </p>
+                    <div className="bg-cream border border-gray-200 rounded-md py-8 px-6 text-center">
+                      <p className="text-sm text-gray-600 font-body mb-4">
+                        No active work orders. Submit a request and we will be
+                        in touch.
+                      </p>
+                      <Link
+                        to="/submit-work-order"
+                        className="inline-block bg-terracotta text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-terracotta-dark transition"
+                      >
+                        Submit a Work Order
+                      </Link>
+                    </div>
                   ) : (
                     <ul className="space-y-4">
                       {workOrders.map((order) => (

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { auth, db } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import Banner from "../components/Banner";
 import jsPDF from "jspdf";
 import logo from "../assets/logo.jpg";
 
@@ -145,30 +147,56 @@ function WorkOrders() {
             </div>
 
             {banner && (
-              <div
-                className={`mb-4 flex items-start justify-between gap-4 px-4 py-3 rounded-md ${
-                  banner.type === "success"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-600 text-white"
-                }`}
-              >
-                <span className="text-sm font-body">{banner.message}</span>
-                <button
-                  onClick={() => setBanner(null)}
-                  className="font-bold hover:opacity-80"
-                  aria-label="Dismiss message"
-                >
-                  x
-                </button>
-              </div>
+              <Banner
+                type={banner.type}
+                message={banner.message}
+                onDismiss={() => setBanner(null)}
+              />
             )}
 
             {loading ? (
-              <p className="text-gray-600 font-body">Loading work orders...</p>
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
+              </div>
             ) : filteredOrders.length === 0 ? (
-              <p className="text-gray-600 font-body">
-                No work orders found for this filter.
-              </p>
+              <div className="bg-cream border border-gray-200 rounded-md py-12 px-6 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-terracotta/10">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6 text-terracotta"
+                    aria-hidden="true"
+                  >
+                    <path d="M9 11h6" />
+                    <path d="M9 15h4" />
+                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                    <path d="M5 8a2 2 0 0 1 2-2h7l5 5v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-heading font-semibold text-charcoal mb-2">
+                  No work orders to show
+                </h3>
+                <p className="text-sm text-gray-600 font-body mb-5">
+                  {filter === "All"
+                    ? "Submit a work order request to get started."
+                    : `You have no ${filter
+                        .toLowerCase()
+                        .replace("_", " ")} work orders right now.`}
+                </p>
+                {filter === "All" && (
+                  <Link
+                    to="/submit-work-order"
+                    className="inline-block bg-terracotta text-white px-6 py-3 rounded-md font-semibold hover:bg-terracotta-dark transition"
+                  >
+                    Submit a Work Order
+                  </Link>
+                )}
+              </div>
             ) : (
               <ul className="space-y-4">
                 {filteredOrders.map((order) => (

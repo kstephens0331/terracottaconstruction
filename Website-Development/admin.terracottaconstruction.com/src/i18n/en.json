@@ -28,11 +28,15 @@
   },
   "workOrders": {
     "title": "Work Orders",
-    "placeholder": "This is where you will create and track work orders for each property."
+    "placeholder": "This is where you will create and track work orders for each property.",
+    "empty": "No work orders yet",
+    "emptyHint": "Submit a work order using the form above to get started."
   },
   "customers": {
     "title": "Customers",
     "placeholder": "Here you can manage client details like name, contact info, and job history.",
+    "empty": "No customers yet",
+    "emptyHint": "Add your first customer using the form above.",
     "edit": {
       "title": "Edit Customer",
       "save": "Save Changes",
@@ -50,6 +54,9 @@
     }
   },
   "invoices": {
+    "title": "Invoices",
+    "empty": "No invoices yet",
+    "emptyHint": "Invoices are created from approved quotes.",
     "fromQuote": {
       "button": "+ From Quote",
       "title": "Create Invoice From Quote",
@@ -59,6 +66,25 @@
       "success": "Invoice created from quote",
       "createError": "Failed to create invoice from quote",
       "loadError": "Failed to load approved quotes"
+    }
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "loadError": "Failed to load analytics",
+    "retry": "Try again",
+    "revenueTrend": "Revenue Trend (Last 12 Months)",
+    "revenueLabel": "Revenue",
+    "revenueEmpty": "No payments recorded in the last 12 months.",
+    "workOrderStatus": "Work Order Status",
+    "workOrderEmpty": "No work orders recorded yet.",
+    "topCustomers": "Top 5 Customers (Approved Quotes)",
+    "topCustomersEmpty": "No approved quotes yet.",
+    "approvedTotal": "Approved Total",
+    "kpi": {
+      "totalCustomers": "Total Customers",
+      "totalRevenue": "Total Revenue",
+      "outstandingBalance": "Outstanding Balance",
+      "pendingQuotes": "Pending Quotes"
     }
   },
   "notFound": {
@@ -99,7 +125,8 @@
     "list": {
       "title": "Quotes",
       "newQuote": "New Quote",
-      "empty": "No quotes yet. Create your first quote.",
+      "empty": "No quotes yet",
+      "emptyHint": "Create your first quote to start tracking estimates.",
       "loading": "Loading quotes...",
       "errorLoading": "Failed to load quotes",
       "filterStatus": "Filter by status",

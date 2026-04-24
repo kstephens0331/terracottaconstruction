@@ -153,11 +153,42 @@ function WorkOrders() {
 
       <h2 className="text-xl font-semibold mb-4">All Work Orders</h2>
       {fetchLoading ? (
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-terracotta"></div>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
         </div>
       ) : orders.length === 0 ? (
-        <p className="text-gray-500">No work orders submitted yet.</p>
+        <div className="p-12 text-center">
+          <svg
+            className="w-12 h-12 mx-auto text-gray-300 mb-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+            />
+          </svg>
+          <p className="text-gray-700 font-medium mb-1">
+            No work orders yet
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            Submit a work order using the form above to get started.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.querySelector('input[placeholder^="Customer Name"]');
+              if (el) el.focus();
+            }}
+            className="inline-flex items-center bg-terracotta hover:bg-terracotta/90 text-white px-4 py-2 rounded-md font-medium transition"
+          >
+            + New Work Order
+          </button>
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full table-auto border text-sm">

@@ -280,8 +280,35 @@ export default function QuotesList() {
           {t("quotes.list.errorLoading")}
         </div>
       ) : filteredSorted.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center text-gray-500">
-          {t("quotes.list.empty")}
+        <div className="bg-white rounded-lg shadow p-12 text-center">
+          <svg
+            className="w-12 h-12 mx-auto text-gray-300 mb-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <p className="text-gray-700 font-medium mb-1">
+            {t("quotes.list.empty")}
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            {t("quotes.list.emptyHint") ||
+              "Create your first quote to start tracking estimates."}
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/quotes/new")}
+            className="inline-flex items-center bg-terracotta hover:bg-terracotta/90 text-white px-4 py-2 rounded-md font-medium transition"
+          >
+            {t("quotes.list.newQuote")}
+          </button>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">

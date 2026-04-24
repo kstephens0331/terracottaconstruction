@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiCheckCircle } from "react-icons/fi";
 import { auth, db } from "../supabase";
+import Banner from "../components/Banner";
 import logo from "../assets/logo.jpg";
 
 function Register() {
@@ -102,16 +103,16 @@ function Register() {
             </p>
           </div>
 
-          {resendMessage && (
-            <div className="mb-4 bg-green-50 border border-green-200 text-green-800 rounded-md px-3 py-2 text-sm">
-              {resendMessage}
-            </div>
-          )}
-          {resendError && (
-            <div className="mb-4 bg-red-100 border border-red-300 text-red-700 rounded-md px-3 py-2 text-sm">
-              {resendError}
-            </div>
-          )}
+          <Banner
+            type="success"
+            message={resendMessage}
+            onDismiss={() => setResendMessage("")}
+          />
+          <Banner
+            type="error"
+            message={resendError}
+            onDismiss={() => setResendError("")}
+          />
 
           <button
             type="button"
@@ -151,11 +152,11 @@ function Register() {
           </h1>
         </div>
 
-        {error && (
-          <div className="mb-4 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-md text-sm">
-            {error}
-          </div>
-        )}
+        <Banner
+          type="error"
+          message={error}
+          onDismiss={() => setError("")}
+        />
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">

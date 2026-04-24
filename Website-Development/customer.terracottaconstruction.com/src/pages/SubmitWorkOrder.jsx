@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { auth, db } from "../supabase";
 import Sidebar from "../components/Sidebar";
+import Banner from "../components/Banner";
 
 function SubmitWorkOrder() {
   const [title, setTitle] = useState("");
@@ -77,22 +78,11 @@ function SubmitWorkOrder() {
             </div>
 
             {banner && (
-              <div
-                className={`mb-4 flex items-start justify-between gap-4 px-4 py-3 rounded-md ${
-                  banner.type === "success"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-600 text-white"
-                }`}
-              >
-                <span className="text-sm font-body">{banner.message}</span>
-                <button
-                  onClick={() => setBanner(null)}
-                  className="font-bold hover:opacity-80"
-                  aria-label="Dismiss message"
-                >
-                  x
-                </button>
-              </div>
+              <Banner
+                type={banner.type}
+                message={banner.message}
+                onDismiss={() => setBanner(null)}
+              />
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">

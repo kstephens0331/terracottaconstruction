@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { auth } from "../supabase";
+import Banner from "../components/Banner";
 import logo from "../assets/logo.jpg";
 
 function Login() {
@@ -96,11 +97,11 @@ function Login() {
           </h1>
         </div>
 
-        {error && (
-          <div className="mb-4 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-md text-sm">
-            {error}
-          </div>
-        )}
+        <Banner
+          type="error"
+          message={error}
+          onDismiss={() => setError("")}
+        />
 
         <form onSubmit={handleEmailLogin} className="space-y-4">
           <div>
@@ -194,11 +195,7 @@ function Login() {
               </div>
             ) : (
               <form onSubmit={handleResetSubmit} className="space-y-4">
-                {resetError && (
-                  <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-md text-sm">
-                    {resetError}
-                  </div>
-                )}
+                <Banner type="error" message={resetError} />
                 <div>
                   <label className="block text-sm font-medium text-charcoal mb-1">
                     Email

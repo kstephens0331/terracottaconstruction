@@ -1,3 +1,4 @@
+// TODO: implement translation map; currently only toggles language state without translating strings.
 import React, { createContext, useContext, useState } from "react";
 
 const LanguageContext = createContext();

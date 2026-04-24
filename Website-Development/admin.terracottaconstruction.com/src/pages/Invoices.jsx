@@ -178,13 +178,39 @@ export default function Invoices() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-10 w-10 rounded-full border-b-2 border-terracotta"></div>
         </div>
       ) : invoices.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <p>No invoices found</p>
-          <p className="text-sm mt-2">Invoices are created from approved quotes</p>
+        <div className="bg-white rounded-lg shadow p-12 text-center">
+          <svg
+            className="w-12 h-12 mx-auto text-gray-300 mb-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21l-7-3-7 3V5a2 2 0 012-2h10a2 2 0 012 2v16z"
+            />
+          </svg>
+          <p className="text-gray-700 font-medium mb-1">
+            {t('invoices.empty') || 'No invoices yet'}
+          </p>
+          <p className="text-sm text-gray-500 mb-4">
+            {t('invoices.emptyHint') ||
+              'Invoices are created from approved quotes.'}
+          </p>
+          <button
+            type="button"
+            onClick={openFromQuoteModal}
+            className="inline-flex items-center bg-terracotta hover:bg-terracotta/90 text-white px-4 py-2 rounded-md font-medium transition"
+          >
+            {t('invoices.fromQuote.button') || '+ From Quote'}
+          </button>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
