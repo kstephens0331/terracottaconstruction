@@ -74,7 +74,7 @@ function Quotes() {
     doc.line(10, 260, 200, 260);
     doc.text("Terracotta Construction", 10, 266);
     doc.text("(936) 955-4083 | (832) 288-0258", 10, 272);
-    doc.text("terracottaconstruction@gmail.com", 10, 278);
+    doc.text("terracottaconstruction1@gmail.com", 10, 278);
     doc.text("16724 E. Forrestal St, Montgomery, TX 77316", 10, 284);
 
     doc.save(`quote-${quote.quote_number || quote.id.slice(0, 8)}.pdf`);

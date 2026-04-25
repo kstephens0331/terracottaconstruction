@@ -5,7 +5,7 @@
 const COMPANY = {
   name: 'Terracotta Construction',
   phone: '(936) 955-4083',
-  email: 'terracottaconstruction@gmail.com',
+  email: 'terracottaconstruction1@gmail.com',
   website: 'https://terracottaconstruction.com',
   address: '16724 E. Forrestal St, Montgomery, TX 77316'
 };

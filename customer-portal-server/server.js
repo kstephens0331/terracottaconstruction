@@ -156,7 +156,7 @@ app.post('/api/quote-revisions', emailLimiter, verifyCustomer, async (req, res) 
     }
 
     // Notify admin via branded email.
-    const adminTo = process.env.ADMIN_NOTIFICATION_EMAIL || 'terracottaconstruction@gmail.com';
+    const adminTo = process.env.ADMIN_NOTIFICATION_EMAIL || 'terracottaconstruction1@gmail.com';
     const rendered = renderTemplate('quote-revision-request', {
       quoteId,
       quoteNumber: quote.quote_number,

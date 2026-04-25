@@ -6,7 +6,7 @@ const COMPANY = {
   name: 'Terracotta Construction',
   phonePrimary: '(936) 955-4083',
   phoneAlt: '(832) 288-0258',
-  email: 'terracottaconstruction@gmail.com',
+  email: 'terracottaconstruction1@gmail.com',
   address: '16724 E. Forrestal St, Montgomery, TX 77316',
   hours: 'Mon-Fri 7AM-6PM | Sat 8AM-2PM',
   publicSite: 'https://terracottaconstruction.com',

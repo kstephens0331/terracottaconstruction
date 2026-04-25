@@ -44,7 +44,7 @@ Then edit `.env`:
 | `SUPABASE_SERVICE_ROLE_KEY` | From Supabase dashboard -> Project Settings -> API -> `service_role` (secret). |
 | `RESEND_API_KEY` | The key from Step 1. |
 | `RESEND_FROM_EMAIL` | `Terracotta Construction <quotes@terracottaconstruction.com>` |
-| `ADMIN_NOTIFICATION_EMAIL` | `terracottaconstruction@gmail.com` |
+| `ADMIN_NOTIFICATION_EMAIL` | `terracottaconstruction1@gmail.com` |
 | `PUBLIC_SITE_URL` | `https://terracottaconstruction.com` |
 | `CUSTOMER_PORTAL_URL` | `https://customer.terracottaconstruction.com` |
 | `ADMIN_PORTAL_URL` | `https://admin.terracottaconstruction.com` |
@@ -179,7 +179,7 @@ Verify the full flow in production:
 
 **Customer round-trip**
 - [ ] Log back in as test customer -> see the quote -> click "Request Revision" -> enter message.
-- [ ] Verify admin (`terracottaconstruction@gmail.com`) receives branded "Revision requested" email.
+- [ ] Verify admin (`terracottaconstruction1@gmail.com`) receives branded "Revision requested" email.
 - [ ] Quote status updates to "Revision Requested" with the customer's message visible in admin Quote Detail.
 
 **Smart Estimate (admin)**
