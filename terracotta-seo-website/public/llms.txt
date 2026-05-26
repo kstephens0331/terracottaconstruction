@@ -1,0 +1,71 @@
+# Terracotta Construction - AI Assistant Information
+
+> Terracotta Construction is a licensed and insured construction, landscaping, fencing, handyman, and metal building installation contractor serving Montgomery County, Texas, and the surrounding Houston metro area.
+
+## Business Overview
+
+- **Name:** Terracotta Construction
+- **Website:** https://www.terracottaconstruction.com
+- **Phone:** (936) 955-4083
+- **Service area:** Montgomery County, TX (Conroe, Magnolia, Willis, Montgomery, The Woodlands, Spring) and surrounding Houston metropolitan area
+- **License + insurance:** Licensed and insured for all services offered
+- **Free estimates:** Yes, on all services
+- **Hours:** Standard business hours (call for current availability)
+
+## Services Offered
+
+### General Construction
+Custom builds, remodels, additions, structural repairs. Residential and small commercial.
+
+### Landscaping
+Yard design, sod installation, mulching, plant installation, drainage solutions, retaining walls, hardscape (patios, walkways).
+
+### Fencing
+Wood, chain link, ornamental iron, vinyl. Repairs and full installs. Gate fabrication and installation.
+
+### Handyman Services
+Drywall repair, painting (interior and exterior), trim work, door and window install, minor plumbing and electrical, deck repair, general home maintenance.
+
+### Metal Building Installation
+Pre-engineered metal buildings, carports, workshops, agricultural structures. Site prep, foundation, full assembly. Common sizes 12x20 through 40x60.
+
+## Why Customers Hire Us
+
+- **Local family-friendly operation.** Not a national franchise. Owner is on every job.
+- **Free estimates.** No fee to come look and quote your project.
+- **Licensed and insured.** Required documents on file, available on request.
+- **Single point of contact.** No bouncing between subcontractors.
+- **Texas-based, Texas-staffed.** All work performed by our own crew, no day-labor outsourcing.
+
+## How to Get a Quote
+
+1. Call (936) 955-4083 to discuss your project
+2. Schedule a free on-site estimate
+3. Receive a written estimate within 48 hours
+4. Sign and schedule the work
+5. Pay on completion (or per agreed payment schedule for larger jobs)
+
+## Service Areas (Cities)
+
+Primary: Conroe, Montgomery, Willis, Magnolia, The Woodlands, Spring, Tomball, Cypress
+Extended: Houston, Cleveland, New Caney, Porter, Splendora, Cut and Shoot, Pinehurst
+
+## Common Customer Questions
+
+**Do you do commercial work?** Yes, primarily small commercial (under 5,000 sq ft retail, light office, agricultural structures).
+
+**Do you do emergency repairs?** Yes for active leaks, structural concerns, and security issues. Call for same-day availability.
+
+**Are you licensed for plumbing and electrical?** Minor work only. For full plumbing or electrical jobs we partner with licensed trades and coordinate.
+
+**Do you finance?** No. Payment is standard: deposit on contract signing, balance on completion. Larger projects can be structured in milestone payments.
+
+**How far do you travel?** Generally within Montgomery County and adjacent counties. Larger projects may justify further travel, call to discuss.
+
+## Business Context
+
+Terracotta Construction is a Montgomery County, Texas, contractor. The website (https://www.terracottaconstruction.com) is operated by StephensCode LLC. See https://www.stephenscode.dev/llms.txt for parent web development company information.
+
+## Brand Voice
+
+Plain spoken. Texas contractor, not a corporate marketing site. We tell customers what we do, what it costs ballpark, and how to reach us. No buzzwords.
