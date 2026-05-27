@@ -149,7 +149,11 @@ export const defaultMetadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: siteConfig.url,
+    // url intentionally omitted from default. With metadataBase set, the page-level
+    // alternates.canonical is the source of truth for URL. Setting a default url here
+    // applies to ALL pages, causing every inner page to claim og:url = site root and
+    // triggering Ahrefs 'Open Graph URL not matching canonical' (2026-05-27).
+    // Individual pages can still set their own openGraph.url if needed.
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
