@@ -2,7 +2,7 @@
 export const siteConfig = {
   name: 'Terracotta Construction',
   description: 'Professional construction, landscaping, fencing, handyman services, and metal building installation in Montgomery County, TX and surrounding areas. Licensed, insured, and trusted since day one.',
-  url: 'https://terracottaconstruction.com',
+  url: 'https://www.terracottaconstruction.com',
   ogImage: '/og-image.jpg',
 
   // Business Information

@@ -6,7 +6,7 @@ Disallow: /admin/
 Disallow: /_next/
 
 # Host
-Host: https://terracottaconstruction.com
+Host: https://www.terracottaconstruction.com
 
 # Sitemaps
-Sitemap: https://terracottaconstruction.com/sitemap.xml
+Sitemap: https://www.terracottaconstruction.com/sitemap.xml

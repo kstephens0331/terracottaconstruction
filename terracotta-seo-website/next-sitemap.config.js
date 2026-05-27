@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: 'https://terracottaconstruction.com',
+  siteUrl: 'https://www.terracottaconstruction.com',
   generateRobotsTxt: true,
   generateIndexSitemap: false,
   changefreq: 'weekly',
@@ -69,7 +69,7 @@ module.exports = {
       },
     ],
     additionalSitemaps: [
-      'https://terracottaconstruction.com/sitemap.xml',
+      'https://www.terracottaconstruction.com/sitemap.xml',
     ],
   },
 };
